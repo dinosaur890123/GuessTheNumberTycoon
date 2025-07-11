@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Guess the Number Tycoon 💰</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    <div id="game-container">
+        <h1 class="rainbow-text">🎯 Guess the Number Tycoon 💰</h1>
+        <div id="game-info">
+            <p>I'm thinking of a number between <span id="range-display">1 and 20</span></p>
+            <div id="fun-facts">
+                <div id="fun-fact-display">🎲 Ready to play? Let's go!</div>
+            </div>
+            <div id="stats-container">
+                <div class="stat pulse">Money: $<span id="money">0</span></div>
+                <div class="stat">Income/sec: $<span id="income-per-second">0</span></div>
+                <div class="stat">Prestige: <span id="prestige-points">0</span> ⭐</div>
+                <div class="stat">Correct Guesses: <span id="correct-guesses">0</span></div>
+                <div class="stat">Total Guesses: <span id="total-guesses">0</span></div>
+                <div class="stat">Accuracy: <span id="accuracy">0%</span></div>
+            </div>
+        </div>
+        
+        <div id="game-area">
+            <div id="number-wheel">🎰</div>
+            <input type="number" id="guessInput" placeholder="Enter your guess" class="glow-input">
+            <button id="guessButton" class="fun-button">🎯 Guess!</button>
+            <div id="hint-container">
+                <p id="message"></p>
+                <p id="hint"></p>
+            </div>
+        </div>
+
+        <div id="shop-and-achievements">
+            <div class="tabs">
+                <button class="tab-link active" onclick="openTab(event, 'upgrades-container')">🚀 Upgrades</button>
+                <button class="tab-link" onclick="openTab(event, 'miners-container')">⛏️ Miners</button>
+                <button class="tab-link" onclick="openTab(event, 'achievements-container')">🏆 Achievements</button>
+            </div>
+
+            <div id="upgrades-container" class="tab-content" style="display: block;">
+                <div id="upgrades-grid">
+                    <button id="bigger-payout" class="upgrade-btn bounce-hover">
+                        💰 Increase Payout<br>
+                        <small>Cost: $<span class="cost">10</span> | Level <span class="level">1</span></small>
+                    </button>
+                    <button id="lucky-bonus" class="upgrade-btn bounce-hover">
+                        🍀 Lucky Bonus<br>
+                        <small>Cost: $<span class="cost">25</span> | Level <span class="level">0</span></small>
+                    </button>
+                    <button id="range-reducer" class="upgrade-btn bounce-hover">
+                        📉 Reduce Range<br>
+                        <small>Cost: $<span class="cost">50</span> | Level <span class="level">0</span></small>
+                    </button>
+                    <button id="hint-power" class="upgrade-btn bounce-hover">
+                        💡 Hint Power<br>
+                        <small>Cost: $<span class="cost">75</span> | Level <span class="level">0</span></small>
+                    </button>
+                    <button id="bigger-range" class="upgrade-btn bounce-hover">
+                        📈 Bigger Range<br>
+                        <small>Cost: $<span class="cost">150</span> | Level <span class="level">0</span></small>
+                    </button>
+                    <button id="streak-multiplier" class="upgrade-btn bounce-hover">
+                        🔥 Streak Multiplier<br>
+                        <small>Cost: $<span class="cost">100</span> | Level <span class="level">0</span></small>
+                    </button>
+                    <button id="auto-guesser" class="upgrade-btn bounce-hover">
+                        🤖 Auto Guesser<br>
+                        <small>Cost: $<span class="cost">500</span> | Level <span class="level">0</span></small>
+                    </button>
+                    <button id="prestige" class="upgrade-btn prestige-btn rainbow-border">
+                        ⭐ Prestige<br>
+                        <small>Reset for permanent bonuses!</small>
+                    </button>
+                </div>
+            </div>
+
+            <div id="miners-container" class="tab-content">
+                <div id="miners-grid">
+                    <button id="bronze-miner" class="miner-btn bounce-hover">
+                        🥉 Bronze Miner<br>
+                        <small>Generates $1/sec</small>
+                        <small>Cost: $<span class="cost">20</span> | Owned: <span class="owned">0</span></small>
+                    </button>
+                    <button id="silver-miner" class="miner-btn bounce-hover">
+                        🥈 Silver Miner<br>
+                        <small>Generates $10/sec</small>
+                        <small>Cost: $<span class="cost">1000</span> | Owned: <span class="owned">0</span></small>
+                    </button>
+                    <button id="gold-miner" class="miner-btn bounce-hover">
+                        🥇 Gold Miner<br>
+                        <small>Generates $100/sec</small>
+                        <small>Cost: $<span class="cost">10000</span> | Owned: <span class="owned">0</span></small>
+                    </button>
+                </div>
+            </div>
+
+            <div id="achievements-container" class="tab-content">
+                <div id="achievements-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fun floating elements -->
+    <div id="floating-money"></div>
+    <div id="celebration-container"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
