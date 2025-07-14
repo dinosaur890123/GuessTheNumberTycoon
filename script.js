@@ -7,6 +7,8 @@ let totalGuesses = 0;
 let currentStreak = 0;
 let bestStreak = 0;
 let prestigePoints = 0;
+let lastSaveTime = Date.now(); // For offline progress calculation
+let totalMoneyEarned = 0; // Track lifetime earnings for achievements
 
 // Achievement tracking
 let achievementCounters = {
@@ -230,6 +232,7 @@ const totalGuessesDisplay = document.getElementById('total-guesses');
 const accuracyDisplay = document.getElementById('accuracy');
 const rangeDisplay = document.getElementById('range-display');
 const numberWheel = document.getElementById('number-wheel');
+const totalMoneyDisplay = document.getElementById('total-money-display');
 
 // Achievements system
 let achievements = [
@@ -300,6 +303,8 @@ function initGame() {
     setInterval(applyPassiveIncome, 1000);
     // Cooldown management
     setInterval(updateCooldowns, 1000);
+    // Auto-save every 30 seconds
+    setInterval(saveGame, 30000);
     // Golden Number interval
     setInterval(spawnGoldenNumber, 30000);
     // Number Rush chance
@@ -341,6 +346,9 @@ function updateDisplay() {
     totalGuessesDisplay.textContent = totalGuesses;
     accuracyDisplay.textContent = totalGuesses > 0 ? Math.round((correctGuesses / totalGuesses) * 100) + '%' : '0%';
     rangeDisplay.textContent = `${gameSettings.minNumber} and ${gameSettings.maxNumber}`;
+    if (totalMoneyDisplay) {
+        totalMoneyDisplay.textContent = Math.floor(totalMoneyEarned);
+    }
     updateUpgradeButtons();
     updateMinerButtons();
 }
@@ -499,6 +507,7 @@ function makeGuess() {
         if (specialEvents.goldenNumber.active && userGuess === specialEvents.goldenNumber.number) {
             payout *= specialEvents.goldenNumber.multiplier;
             specialEvents.goldenNumber.active = false;
+            achievementCounters.goldenNumbersHit++; // Track for achievements
             showHint(`✨ GOLDEN NUMBER HIT! ${specialEvents.goldenNumber.multiplier}x BONUS!`);
             createConfetti('golden');
             screenShake();
@@ -523,6 +532,7 @@ function makeGuess() {
         }
         
         money += payout;
+        totalMoneyEarned += payout; // Track for achievements
         
         // Create floating money effect
         const rect = guessButton.getBoundingClientRect();
@@ -685,6 +695,7 @@ function spinTheWheel() {
         showHint(`The wheel landed on: ${prize.text}!`);
         if (prize.value > 0) {
             money += prize.value;
+            totalMoneyEarned += prize.value; // Track for achievements
             createFloatingMoney(prize.value, window.innerWidth / 2, window.innerHeight / 2);
             if (prize.value >= 1500) {
                 createConfetti('mega');
@@ -731,8 +742,10 @@ function playSlotMachine() {
 
     if (winnings > 0) {
         money += winnings;
+        totalMoneyEarned += winnings; // Track for achievements
         createFloatingMoney(winnings, window.innerWidth / 2, window.innerHeight / 2);
     }
+    updateDisplay(); // Add missing updateDisplay call
 }
 
 function startNumberBingo() {
@@ -761,6 +774,7 @@ function startNumberBingo() {
     const reward = rewards[Math.floor(Math.random() * rewards.length)];
     
     money += reward;
+    totalMoneyEarned += reward; // Track for achievements
     showHint(`🎯 Bingo! You won $${reward}!`);
     createFloatingMoney(reward, window.innerWidth / 2, window.innerHeight / 3);
     updateDisplay();
@@ -790,6 +804,8 @@ function startRapidFire() {
             
             const bonus = rapidFireScore * 100; // Increased from 50 to 100 per correct guess
             money += bonus;
+            totalMoneyEarned += bonus; // Track for achievements
+            achievementCounters.rapidFireBest = Math.max(achievementCounters.rapidFireBest, rapidFireScore);
             showHint(`⚡ Rapid Fire ended! Bonus: $${bonus} (${rapidFireScore} correct guesses)`);
             updateDisplay();
         }
@@ -848,6 +864,7 @@ function activateLuckyDraw() {
         showHint(`🍀 ${prize.text}`);
         if (prize.type === 'money') {
             money += prize.value;
+            totalMoneyEarned += prize.value; // Track for achievements
             createFloatingMoney(prize.value, window.innerWidth / 2, window.innerHeight / 2);
         } else if (prize.type === 'prestige') {
             prestigePoints += prize.value;
@@ -978,7 +995,7 @@ function applyPrestige() {
     renderAchievements();
 }
 
-// Passive income
+// Passive income with tracking
 function applyPassiveIncome() {
     let totalIncome = 0;
     
@@ -991,7 +1008,12 @@ function applyPassiveIncome() {
     // Calculate income from upgrades
     totalIncome += upgrades.autoGuesser.level * 5;
     
-    money += totalIncome;
+    if (totalIncome > 0) {
+        money += totalIncome;
+        totalMoneyEarned += totalIncome; // Track for achievements
+        incomePerSecond = totalIncome; // Update the display value
+    }
+    
     updateDisplay();
 }
 
@@ -1024,7 +1046,7 @@ function unlockPrestigeUpgrades() {
     }
 }
 
-// Save and load game
+// Enhanced Save and Load System with Offline Progress
 function saveGame() {
     const gameData = {
         money,
@@ -1034,28 +1056,170 @@ function saveGame() {
         currentStreak,
         bestStreak,
         prestigePoints,
+        totalMoneyEarned,
         upgrades,
-        miners
+        miners,
+        achievements,
+        achievementCounters,
+        gameSettings,
+        lastSaveTime: Date.now()
     };
     
     localStorage.setItem('numberGuessingGame', JSON.stringify(gameData));
+    console.log('Game saved successfully!');
+}
+
+// Manual save with feedback
+function manualSave() {
+    saveGame();
+    showHint('💾 Game saved successfully!');
+    createFloatingMoney(0, window.innerWidth / 2, window.innerHeight / 2);
+}
+
+// Manual load with feedback
+function manualLoad() {
+    const confirmLoad = confirm('⚠️ Loading will overwrite your current progress. Are you sure?');
+    if (confirmLoad) {
+        loadGame();
+        updateDisplay();
+        renderAchievements();
+        showHint('📂 Game loaded successfully!');
+    }
+}
+
+// Reset game with confirmation
+function resetGame() {
+    const confirmReset = confirm('⚠️ This will permanently delete ALL your progress! Are you absolutely sure?');
+    if (confirmReset) {
+        const doubleConfirm = confirm('🚨 FINAL WARNING: This cannot be undone! Reset everything?');
+        if (doubleConfirm) {
+            localStorage.removeItem('numberGuessingGame');
+            location.reload(); // Reload the page to start fresh
+        }
+    }
+}
+
+// Export save data as text
+function exportSave() {
+    const gameData = localStorage.getItem('numberGuessingGame');
+    if (gameData) {
+        const blob = new Blob([gameData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `GuessTheNumberTycoon_Save_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showHint('💾 Save file exported successfully!');
+    } else {
+        showHint('❌ No save data to export!');
+    }
+}
+
+// Import save data from file
+function importSave() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const saveData = e.target.result;
+                    JSON.parse(saveData); // Validate JSON
+                    localStorage.setItem('numberGuessingGame', saveData);
+                    loadGame();
+                    updateDisplay();
+                    renderAchievements();
+                    showHint('📂 Save file imported successfully!');
+                } catch (error) {
+                    showHint('❌ Invalid save file!');
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
+    input.click();
 }
 
 function loadGame() {
     const savedData = localStorage.getItem('numberGuessingGame');
     
     if (savedData) {
-        const gameData = JSON.parse(savedData);
-        
-        money = gameData.money;
-        incomePerSecond = gameData.incomePerSecond;
-        correctGuesses = gameData.correctGuesses;
-        totalGuesses = gameData.totalGuesses;
-        currentStreak = gameData.currentStreak;
-        bestStreak = gameData.bestStreak;
-        prestigePoints = gameData.prestigePoints;
-        upgrades = gameData.upgrades;
-        miners = gameData.miners;
+        try {
+            const gameData = JSON.parse(savedData);
+            
+            // Load basic game state
+            money = gameData.money || 25;
+            incomePerSecond = gameData.incomePerSecond || 0;
+            correctGuesses = gameData.correctGuesses || 0;
+            totalGuesses = gameData.totalGuesses || 0;
+            currentStreak = gameData.currentStreak || 0;
+            bestStreak = gameData.bestStreak || 0;
+            prestigePoints = gameData.prestigePoints || 0;
+            totalMoneyEarned = gameData.totalMoneyEarned || 0;
+            
+            // Load upgrades and miners
+            if (gameData.upgrades) {
+                upgrades = { ...upgrades, ...gameData.upgrades };
+            }
+            if (gameData.miners) {
+                miners = { ...miners, ...gameData.miners };
+            }
+            
+            // Load achievements
+            if (gameData.achievements) {
+                // Merge saved achievements with current achievement list
+                gameData.achievements.forEach(savedAch => {
+                    const currentAch = achievements.find(a => a.id === savedAch.id);
+                    if (currentAch) {
+                        currentAch.unlocked = savedAch.unlocked;
+                    }
+                });
+            }
+            
+            // Load achievement counters
+            if (gameData.achievementCounters) {
+                achievementCounters = { ...achievementCounters, ...gameData.achievementCounters };
+            }
+            
+            // Load game settings
+            if (gameData.gameSettings) {
+                gameSettings = { ...gameSettings, ...gameData.gameSettings };
+            }
+            
+            // Calculate offline earnings
+            const offlineTime = Date.now() - (gameData.lastSaveTime || Date.now());
+            if (offlineTime > 5000 && incomePerSecond > 0) { // Only if offline for more than 5 seconds
+                const offlineHours = Math.min(offlineTime / (1000 * 60 * 60), 24); // Cap at 24 hours
+                const offlineEarnings = Math.floor(incomePerSecond * offlineHours * 3600);
+                
+                if (offlineEarnings > 0) {
+                    money += offlineEarnings;
+                    totalMoneyEarned += offlineEarnings;
+                    
+                    // Show offline earnings popup
+                    setTimeout(() => {
+                        showHint(`💤 Welcome back! You earned $${offlineEarnings} while away (${Math.floor(offlineHours)}h ${Math.floor((offlineHours % 1) * 60)}m)`);
+                        createFloatingMoney(offlineEarnings, window.innerWidth / 2, window.innerHeight / 3);
+                    }, 1000);
+                }
+            }
+            
+            lastSaveTime = Date.now();
+            console.log('Game loaded successfully!');
+            
+        } catch (error) {
+            console.error('Error loading save data:', error);
+            showHint('⚠️ Save data corrupted, starting fresh!');
+        }
+    } else {
+        console.log('No save data found, starting new game!');
+        lastSaveTime = Date.now();
     }
 }
 
@@ -1075,11 +1239,11 @@ function checkAchievements() {
         unlockAchievement('guessing_guru');
     }
     
-    if (money >= 500 && !achievements.find(a => a.id === 'big_spender').unlocked) { // Reduced from 1000 to 500
+    if (totalMoneyEarned >= 500 && !achievements.find(a => a.id === 'big_spender').unlocked) { // Track total earned
         unlockAchievement('big_spender');
     }
     
-    if (money >= 5000 && !achievements.find(a => a.id === 'high_roller').unlocked) { // Reduced from 10000 to 5000
+    if (totalMoneyEarned >= 5000 && !achievements.find(a => a.id === 'high_roller').unlocked) { // Track total earned
         unlockAchievement('high_roller');
     }
     
@@ -1091,12 +1255,45 @@ function checkAchievements() {
         unlockAchievement('on_fire');
     }
     
-    if (money >= 5000 && !achievements.find(a => a.id === 'millionaire').unlocked) { // Reduced from 10000 to 5000
+    if (totalMoneyEarned >= 5000 && !achievements.find(a => a.id === 'millionaire').unlocked) { // Track total earned
         unlockAchievement('millionaire');
     }
     
-    if (money >= 500000 && !achievements.find(a => a.id === 'tycoon').unlocked) { // Reduced from 1000000 to 500000
+    if (totalMoneyEarned >= 500000 && !achievements.find(a => a.id === 'tycoon').unlocked) { // Track total earned
         unlockAchievement('tycoon');
+    }
+    
+    // Check for new fun feature achievements
+    if (achievementCounters.goldenNumbersHit >= 1 && !achievements.find(a => a.id === 'golden_hunter').unlocked) {
+        unlockAchievement('golden_hunter');
+    }
+    
+    if (achievementCounters.powerUpsUsed >= 5 && !achievements.find(a => a.id === 'power_user').unlocked) {
+        unlockAchievement('power_user');
+    }
+    
+    if (achievementCounters.miniGamesPlayed >= 10 && !achievements.find(a => a.id === 'gambler').unlocked) {
+        unlockAchievement('gambler');
+    }
+    
+    if (currentStreak >= 10 && !achievements.find(a => a.id === 'combo_master').unlocked) {
+        unlockAchievement('combo_master');
+    }
+    
+    if (achievementCounters.luckyDrawWins >= 3 && !achievements.find(a => a.id === 'lucky_charm').unlocked) {
+        unlockAchievement('lucky_charm');
+    }
+    
+    if (achievementCounters.slotJackpots >= 2 && !achievements.find(a => a.id === 'slot_king').unlocked) {
+        unlockAchievement('slot_king');
+    }
+    
+    if (achievementCounters.wheelSpins >= 25 && !achievements.find(a => a.id === 'wheel_spinner').unlocked) {
+        unlockAchievement('wheel_spinner');
+    }
+    
+    if (achievementCounters.rapidFireBest >= 10 && !achievements.find(a => a.id === 'rapid_fire_master').unlocked) {
+        unlockAchievement('rapid_fire_master');
     }
     
     if (totalGuesses >= 15 && (correctGuesses / totalGuesses) >= 0.7 && !achievements.find(a => a.id === 'accuracy_king').unlocked) { // Reduced requirements
@@ -1205,6 +1402,7 @@ function spawnMysteryBox() {
         showHint(`🎁 Mystery Box: ${prize.text}`);
         if (prize.type === 'money') {
             money += prize.value;
+            totalMoneyEarned += prize.value; // Track for achievements
             createFloatingMoney(prize.value, parseFloat(box.style.left), parseFloat(box.style.top));
         } else if (prize.type === 'prestige') {
             prestigePoints += prize.value;

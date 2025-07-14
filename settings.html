@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Guess the Number Tycoon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="settings-page-container">
+        <h1>⚙️ Settings</h1>
+        <div class="settings-section">
+            <h3>💾 Save & Load</h3>
+            <div class="save-load-buttons">
+                <button class="save-btn" onclick="manualSave()">💾 Save Game</button>
+                <button class="load-btn" onclick="manualLoad()">📂 Load Game</button>
+            </div>
+            <div class="backup-buttons">
+                <button class="export-btn" onclick="exportSave()">📤 Export Save</button>
+                <button class="import-btn" onclick="importSave()">📥 Import Save</button>
+            </div>
+            <div class="danger-zone">
+                <h4>⚠️ Danger Zone</h4>
+                <button class="reset-btn" onclick="resetGame()">🗑️ Reset Everything</button>
+                <p><small>⚠️ This will permanently delete all progress!</small></p>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h3>📊 Game Info</h3>
+            <p><strong>Auto-save:</strong> Every 30 seconds</p>
+            <p><strong>Offline Progress:</strong> Up to 24 hours</p>
+            <p><strong>Total Money Earned:</strong> $<span id="total-money-display">0</span></p>
+            <p><strong>Current Version:</strong> v1.2.0</p>
+        </div>
+        <a href="index.html" class="back-btn">⬅️ Back to Game</a>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -8,18 +8,18 @@
 </head>
 <body>
     <canvas id="particles"></canvas>
+    <div id="main-money-display">
+        <span class="money-label">Money</span>
+        <span class="money-value">$<span id="money">0</span></span>
+    </div>
     <div id="game-container">
-        <h1>🎯 Guess the Number Tycoon 💰</h1>
+        <h1>Guess the Number Tycoon</h1>
         <div id="game-info">
             <p>I'm thinking of a number between <span id="range-display">1 and 10</span></p>
             <div id="fun-facts">
-                <div id="fun-fact-display">🎲 Ready to play? Let's go!</div>
+                <div id="fun-fact-display">Ready to play? Let's go!</div>
             </div>
             <div id="stats-container">
-                <div class="stat-item">
-                    <div class="stat-label">Money</div>
-                    <div class="stat-value">$<span id="money">0</span></div>
-                </div>
                 <div class="stat-item">
                     <div class="stat-label">Income/sec</div>
                     <div class="stat-value">$<span id="income-per-second">0</span></div>
@@ -61,6 +61,7 @@
                     <button class="tab-btn" onclick="openTab(event, 'powerups-container')">⚡ Power-ups</button>
                     <button class="tab-btn" onclick="openTab(event, 'minigames-container')">🎮 Mini-games</button>
                     <button class="tab-btn" onclick="openTab(event, 'achievements-container')">🏆 Achievements</button>
+                    <a href="settings.html" class="tab-btn settings-link">⚙️ Settings</a>
                 </div>
             </div>
 
@@ -174,6 +175,8 @@
             <div id="achievements-container" class="tab-content">
                 <div id="achievements-list"></div>
             </div>
+
+            <!-- Settings tab removed. Use the new settings.html page. -->
         </div>
     </div>
     

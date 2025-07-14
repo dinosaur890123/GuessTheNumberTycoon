@@ -1,3 +1,69 @@
+/* Settings page container */
+#settings-page-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+    text-align: center;
+}
+.back-btn {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 10px 24px;
+    background: #4299e1;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.back-btn:hover {
+    background: #3182ce;
+}
+.settings-link {
+    text-decoration: none;
+    color: #718096;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 12px 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+.settings-link:hover {
+    background: #edf2f7;
+    color: #4a5568;
+}
+/* Large Money Display at Top */
+#main-money-display {
+    width: 100%;
+    text-align: center;
+    margin: 0 auto 24px auto;
+    padding: 24px 0 8px 0;
+    background: linear-gradient(90deg, #f7fafc 60%, #e6fffa 100%);
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 2px 12px rgba(56, 178, 172, 0.08);
+}
+.money-label {
+    display: block;
+    font-size: 1.1rem;
+    color: #38b2ac;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+.money-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #2d3748;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(56, 178, 172, 0.12);
+}
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 * {
@@ -200,7 +266,8 @@ h3 {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 24px;
+    padding: 16px 12px 12px 12px;
+    margin-bottom: 12px;
 }
 
 /* Tabs */
@@ -243,8 +310,8 @@ h3 {
 }
 
 .tab-content {
-    min-height: 300px;
-    padding: 0;
+    min-height: 220px;
+    padding: 0 0 8px 0;
 }
 
 /* Grids */
@@ -368,6 +435,10 @@ h3 {
     position: fixed;
     pointer-events: none;
     z-index: 1000;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 0;
 }
 
 .floating-money-particle {
