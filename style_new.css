@@ -1,0 +1,493 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f7fafc;
+    color: #2d3748;
+    padding: 16px;
+    min-height: 100vh;
+}
+
+#game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+/* Typography */
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 24px;
+    color: #1a202c;
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #2d3748;
+}
+
+h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #4a5568;
+}
+
+/* Game Area */
+#game-area {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+#guess-input {
+    width: 200px;
+    padding: 12px;
+    font-size: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+    margin-right: 12px;
+    transition: border-color 0.2s ease;
+}
+
+#guess-input:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+#guess-btn {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+#guess-btn:hover {
+    background: #3182ce;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#guess-btn:active {
+    transform: translateY(0);
+}
+
+/* Stats Container */
+#stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-item {
+    background: #f7fafc;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Shop Container */
+#shop-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.shop-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* Tabs */
+.tab-container {
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 0;
+}
+
+.tab-btn {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    color: #718096;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-btn.active {
+    background: #ffffff;
+    color: #2d3748;
+    border-color: #e2e8f0;
+    font-weight: 600;
+}
+
+.tab-btn:hover:not(.active) {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.tab-content {
+    min-height: 300px;
+    padding: 0;
+}
+
+/* Grids */
+#upgrades-grid, #miners-grid, .powerups-grid, .minigames-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+/* Buttons */
+.upgrade-btn, .miner-btn, .powerup-btn, .minigame-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+    padding: 16px;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+    font-weight: 500;
+}
+
+.upgrade-btn:hover, .miner-btn:hover, .powerup-btn:hover, .minigame-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    border-color: #cbd5e0;
+}
+
+.upgrade-btn:active, .miner-btn:active, .powerup-btn:active, .minigame-btn:active {
+    transform: translateY(0);
+}
+
+.upgrade-btn:disabled, .miner-btn:disabled, .powerup-btn:disabled, .minigame-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    background: #f7fafc;
+}
+
+/* Achievements */
+#achievements-container {
+    margin-top: 24px;
+}
+
+#achievements-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.achievement {
+    background: #f7fafc;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.875rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+    color: #4a5568;
+}
+
+.achievement:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.achievement.unlocked {
+    background: #e6fffa;
+    border-color: #38b2ac;
+    color: #2d3748;
+}
+
+.achievement.unlocked::before {
+    content: '✅';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1rem;
+}
+
+/* Special Achievement Glow */
+.achievement.new-unlock {
+    animation: achievementGlow 2s ease-in-out;
+}
+
+@keyframes achievementGlow {
+    0%, 100% { box-shadow: 0 2px 8px rgba(56, 178, 172, 0.3); }
+    50% { box-shadow: 0 4px 16px rgba(56, 178, 172, 0.6); }
+}
+
+/* Floating Effects */
+#floating-money {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.floating-money-particle {
+    position: absolute;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #38a169;
+    pointer-events: none;
+    z-index: 1000;
+    animation: floatUp 2s ease-out forwards;
+}
+
+.power-up-effect {
+    position: absolute;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 1000;
+    animation: powerUpPulse 2s ease-out forwards;
+}
+
+.combo-effect {
+    position: absolute;
+    font-weight: 700;
+    color: #667eea;
+    pointer-events: none;
+    z-index: 1000;
+    animation: comboExplosion 2s ease-out forwards;
+}
+
+.critical-strike {
+    color: #dc2626 !important;
+    font-weight: 700;
+}
+
+/* Animations */
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(1.2);
+    }
+}
+
+@keyframes powerUpPulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+}
+
+@keyframes comboExplosion {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.4);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.8);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* Special Event Indicators */
+.golden-number-indicator {
+    background: #fff8dc;
+    border: 2px solid #ffd700;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    animation: goldenPulse 2s ease-in-out infinite alternate;
+}
+
+.number-rush-indicator {
+    background: #fff5f5;
+    border: 2px solid #e53e3e;
+    animation: rushPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes goldenPulse {
+    from { box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3); }
+    to { box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5); }
+}
+
+@keyframes rushPulse {
+    from { box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3); }
+    to { box-shadow: 0 4px 12px rgba(229, 62, 62, 0.5); }
+}
+
+/* Number Wheel */
+#number-wheel {
+    font-size: 2.5rem;
+    margin: 20px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #4a5568;
+}
+
+#number-wheel:hover {
+    transform: scale(1.05);
+    color: #2d3748;
+}
+
+/* Rapid Fire Mode */
+.rapid-fire-mode {
+    background: #fff5f5;
+    border-color: #e53e3e;
+    animation: rapidFirePulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes rapidFirePulse {
+    from { opacity: 0.9; }
+    to { opacity: 1; }
+}
+
+/* Cooldown Timer */
+.cooldown-timer {
+    color: #718096;
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    
+    #game-container {
+        max-width: 100%;
+        padding: 16px;
+    }
+    
+    #shop-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .shop-section {
+        padding: 16px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    #guess-input {
+        width: 150px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+    
+    button {
+        font-size: 0.875rem;
+        padding: 8px 16px;
+    }
+    
+    #achievements-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .powerups-grid, .minigames-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .powerup-btn, .minigame-btn {
+        padding: 12px;
+    }
+    
+    #upgrades-grid, #miners-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+    
+    #game-container {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 1.25rem;
+    }
+    
+    .shop-section {
+        padding: 12px;
+    }
+    
+    #guess-input {
+        width: 120px;
+    }
+    
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+    }
+}

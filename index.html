@@ -9,19 +9,37 @@
 <body>
     <canvas id="particles"></canvas>
     <div id="game-container">
-        <h1 class="rainbow-text">🎯 Guess the Number Tycoon 💰</h1>
+        <h1>🎯 Guess the Number Tycoon 💰</h1>
         <div id="game-info">
-            <p>I'm thinking of a number between <span id="range-display">1 and 20</span></p>
+            <p>I'm thinking of a number between <span id="range-display">1 and 10</span></p>
             <div id="fun-facts">
                 <div id="fun-fact-display">🎲 Ready to play? Let's go!</div>
             </div>
             <div id="stats-container">
-                <div class="stat pulse">Money: $<span id="money">0</span></div>
-                <div class="stat">Income/sec: $<span id="income-per-second">0</span></div>
-                <div class="stat">Prestige: <span id="prestige-points">0</span> ⭐</div>
-                <div class="stat">Correct Guesses: <span id="correct-guesses">0</span></div>
-                <div class="stat">Total Guesses: <span id="total-guesses">0</span></div>
-                <div class="stat">Accuracy: <span id="accuracy">0%</span></div>
+                <div class="stat-item">
+                    <div class="stat-label">Money</div>
+                    <div class="stat-value">$<span id="money">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Income/sec</div>
+                    <div class="stat-value">$<span id="income-per-second">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Prestige</div>
+                    <div class="stat-value"><span id="prestige-points">0</span> ⭐</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Correct Guesses</div>
+                    <div class="stat-value"><span id="correct-guesses">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Total Guesses</div>
+                    <div class="stat-value"><span id="total-guesses">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Accuracy</div>
+                    <div class="stat-value"><span id="accuracy">0%</span></div>
+                </div>
             </div>
         </div>
         
@@ -39,6 +57,8 @@
             <div class="tabs">
                 <button class="tab-link active" onclick="openTab(event, 'upgrades-container')">🚀 Upgrades</button>
                 <button class="tab-link" onclick="openTab(event, 'miners-container')">⛏️ Miners</button>
+                <button class="tab-link" onclick="openTab(event, 'powerups-container')">⚡ Power-ups</button>
+                <button class="tab-link" onclick="openTab(event, 'minigames-container')">🎮 Mini-games</button>
                 <button class="tab-link" onclick="openTab(event, 'achievements-container')">🏆 Achievements</button>
             </div>
 
@@ -95,6 +115,56 @@
                         🥇 Gold Miner<br>
                         <small>Generates $100/sec</small>
                         <small>Cost: $<span class="cost">10000</span> | Owned: <span class="owned">0</span></small>
+                    </button>
+                </div>
+            </div>
+
+            <div id="powerups-container" class="tab-content">
+                <div class="powerups-grid">
+                    <button id="double-or-nothing-btn" class="powerup-btn bounce-hover" onclick="activateDoubleOrNothing()">
+                        🎲 Double or Nothing<br>
+                        <small>Next guess: 2x money or lose half!</small>
+                        <small id="don-cooldown"></small>
+                    </button>
+                    <button id="lucky-draw-btn" class="powerup-btn bounce-hover" onclick="activateLuckyDraw()">
+                        🍀 Lucky Draw<br>
+                        <small>Random prize or effect!</small>
+                        <small id="ld-cooldown"></small>
+                    </button>
+                    <button id="time-freeze-btn" class="powerup-btn bounce-hover" onclick="activateTimeFreeze()">
+                        ⏰ Time Freeze<br>
+                        <small>Pause all timers for 30s</small>
+                        <small id="tf-cooldown"></small>
+                    </button>
+                    <button id="number-magnet-btn" class="powerup-btn bounce-hover" onclick="activateNumberMagnet()">
+                        🧲 Number Magnet<br>
+                        <small>Get attracted to the correct number!</small>
+                        <small id="nm-cooldown"></small>
+                    </button>
+                </div>
+            </div>
+
+            <div id="minigames-container" class="tab-content">
+                <div class="minigames-grid">
+                    <button id="spin-wheel-btn" class="minigame-btn bounce-hover" onclick="spinTheWheel()">
+                        🎰 Spin the Wheel<br>
+                        <small>Cost: $<span class="cost">25</span></small>
+                        <small>Win up to $1500!</small>
+                    </button>
+                    <button id="slot-machine-btn" class="minigame-btn bounce-hover" onclick="playSlotMachine()">
+                        🎰 Slot Machine<br>
+                        <small>Cost: $<span class="cost">50</span></small>
+                        <small>Match symbols for big wins!</small>
+                    </button>
+                    <button id="number-bingo-btn" class="minigame-btn bounce-hover" onclick="startNumberBingo()">
+                        🎯 Number Bingo<br>
+                        <small>Cost: $<span class="cost">100</span></small>
+                        <small>Complete a line for jackpot!</small>
+                    </button>
+                    <button id="rapid-fire-btn" class="minigame-btn bounce-hover" onclick="startRapidFire()">
+                        ⚡ Rapid Fire<br>
+                        <small>Cost: $<span class="cost">75</span></small>
+                        <small>30 seconds of speed guessing!</small>
                     </button>
                 </div>
             </div>
