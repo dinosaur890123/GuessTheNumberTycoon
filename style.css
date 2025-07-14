@@ -290,13 +290,15 @@ h3 {
 
 /* Special button styles */
 .prestige-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
     color: white;
-    border-color: #667eea;
+    border-color: #4c51bf;
+    box-shadow: 0 2px 8px rgba(76, 81, 191, 0.3);
 }
 
 .prestige-btn:hover {
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    background: linear-gradient(135deg, #434190 0%, #4c1d95 100%);
+    box-shadow: 0 4px 12px rgba(76, 81, 191, 0.4);
 }
 
 /* Button content styling */
