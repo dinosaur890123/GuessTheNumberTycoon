@@ -14,6 +14,11 @@ body {
     min-height: 100vh;
 }
 
+/* Hide particles canvas */
+#particles {
+    display: none;
+}
+
 #game-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -46,6 +51,76 @@ h3 {
     color: #4a5568;
 }
 
+/* Game Info Section */
+#game-info {
+    background: #f7fafc;
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+#game-info > p {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 16px;
+}
+
+#fun-facts {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#fun-fact-display {
+    font-size: 0.875rem;
+    color: #4a5568;
+    font-weight: 400;
+}
+
+/* Stats Container */
+#stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #718096;
+    margin-bottom: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
 /* Game Area */
 #game-area {
     text-align: center;
@@ -56,7 +131,20 @@ h3 {
     border: 1px solid #e2e8f0;
 }
 
-#guess-input {
+#number-wheel {
+    font-size: 2.5rem;
+    margin: 20px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #4a5568;
+}
+
+#number-wheel:hover {
+    transform: scale(1.05);
+    color: #2d3748;
+}
+
+#guessInput {
     width: 200px;
     padding: 12px;
     font-size: 1rem;
@@ -65,15 +153,16 @@ h3 {
     text-align: center;
     margin-right: 12px;
     transition: border-color 0.2s ease;
+    font-family: 'Inter', sans-serif;
 }
 
-#guess-input:focus {
+#guessInput:focus {
     outline: none;
     border-color: #4299e1;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
 }
 
-#guess-btn {
+#guessButton {
     background: #4299e1;
     color: white;
     border: none;
@@ -83,70 +172,47 @@ h3 {
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: 500;
+    font-family: 'Inter', sans-serif;
 }
 
-#guess-btn:hover {
+#guessButton:hover {
     background: #3182ce;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#guess-btn:active {
+#guessButton:active {
     transform: translateY(0);
 }
 
-/* Stats Container */
-#stats-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
+#hint-container {
+    margin-top: 16px;
 }
 
-.stat-item {
-    background: #f7fafc;
-    padding: 16px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    text-align: center;
-}
-
-.stat-label {
+#hint-container p {
+    margin: 8px 0;
     font-size: 0.875rem;
-    color: #718096;
-    margin-bottom: 4px;
-    font-weight: 500;
+    color: #4a5568;
 }
 
-.stat-value {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #2d3748;
-}
-
-/* Shop Container */
-#shop-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.shop-section {
+/* Shop and Achievements */
+#shop-and-achievements {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 20px;
+    padding: 24px;
 }
 
 /* Tabs */
 .tab-container {
     border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .tab-buttons {
     display: flex;
     gap: 0;
+    overflow-x: auto;
 }
 
 .tab-btn {
@@ -160,6 +226,8 @@ h3 {
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: 8px 8px 0 0;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
 }
 
 .tab-btn.active {
@@ -182,16 +250,16 @@ h3 {
 /* Grids */
 #upgrades-grid, #miners-grid, .powerups-grid, .minigames-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
 }
 
-/* Buttons */
+/* Buttons - Consistent styling for all types */
 .upgrade-btn, .miner-btn, .powerup-btn, .minigame-btn {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     color: #4a5568;
-    padding: 16px;
+    padding: 20px;
     font-size: 0.875rem;
     border-radius: 8px;
     cursor: pointer;
@@ -200,11 +268,12 @@ h3 {
     font-family: 'Inter', sans-serif;
     text-align: left;
     font-weight: 500;
+    line-height: 1.4;
 }
 
 .upgrade-btn:hover, .miner-btn:hover, .powerup-btn:hover, .minigame-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-color: #cbd5e0;
 }
 
@@ -219,20 +288,42 @@ h3 {
     background: #f7fafc;
 }
 
+/* Special button styles */
+.prestige-btn {
+    background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+    color: white;
+    border-color: #4c51bf;
+    box-shadow: 0 2px 8px rgba(76, 81, 191, 0.3);
+}
+
+.prestige-btn:hover {
+    background: linear-gradient(135deg, #434190 0%, #4c1d95 100%);
+    box-shadow: 0 4px 12px rgba(76, 81, 191, 0.4);
+}
+
+/* Button content styling */
+.upgrade-btn small, .miner-btn small, .powerup-btn small, .minigame-btn small {
+    display: block;
+    font-size: 0.75rem;
+    color: #718096;
+    margin-top: 4px;
+    font-weight: 400;
+}
+
 /* Achievements */
 #achievements-container {
-    margin-top: 24px;
+    margin-top: 0;
 }
 
 #achievements-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
 }
 
 .achievement {
     background: #f7fafc;
-    padding: 12px;
+    padding: 16px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
     font-size: 0.875rem;
@@ -240,11 +331,12 @@ h3 {
     transition: all 0.2s ease;
     position: relative;
     color: #4a5568;
+    line-height: 1.4;
 }
 
 .achievement:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .achievement.unlocked {
@@ -256,8 +348,8 @@ h3 {
 .achievement.unlocked::before {
     content: '✅';
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 12px;
+    right: 12px;
     font-size: 1rem;
 }
 
@@ -380,20 +472,6 @@ h3 {
     to { box-shadow: 0 4px 12px rgba(229, 62, 62, 0.5); }
 }
 
-/* Number Wheel */
-#number-wheel {
-    font-size: 2.5rem;
-    margin: 20px 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #4a5568;
-}
-
-#number-wheel:hover {
-    transform: scale(1.05);
-    color: #2d3748;
-}
-
 /* Rapid Fire Mode */
 .rapid-fire-mode {
     background: #fff5f5;
@@ -421,15 +499,6 @@ h3 {
     }
     
     #game-container {
-        max-width: 100%;
-        padding: 16px;
-    }
-    
-    #shop-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .shop-section {
         padding: 16px;
     }
     
@@ -437,31 +506,37 @@ h3 {
         font-size: 1.5rem;
     }
     
-    #guess-input {
+    #guessInput {
         width: 150px;
         margin-right: 8px;
         margin-bottom: 8px;
     }
     
-    button {
+    #guessButton {
         font-size: 0.875rem;
-        padding: 8px 16px;
+        padding: 10px 20px;
     }
     
-    #achievements-list {
+    #stats-container {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+    }
+    
+    .tab-buttons {
+        gap: 0;
+    }
+    
+    .tab-btn {
+        padding: 10px 16px;
+        font-size: 0.75rem;
+    }
+    
+    #upgrades-grid, #miners-grid, .powerups-grid, .minigames-grid, #achievements-list {
         grid-template-columns: 1fr;
     }
     
-    .powerups-grid, .minigames-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .powerup-btn, .minigame-btn {
-        padding: 12px;
-    }
-    
-    #upgrades-grid, #miners-grid {
-        grid-template-columns: 1fr;
+    .upgrade-btn, .miner-btn, .powerup-btn, .minigame-btn {
+        padding: 16px;
     }
 }
 
@@ -478,16 +553,20 @@ h3 {
         font-size: 1.25rem;
     }
     
-    .shop-section {
-        padding: 12px;
+    #game-info, #game-area, #shop-and-achievements {
+        padding: 16px;
     }
     
-    #guess-input {
+    #guessInput {
         width: 120px;
     }
     
     .tab-btn {
         padding: 8px 12px;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+    }
+    
+    #stats-container {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

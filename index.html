@@ -45,8 +45,8 @@
         
         <div id="game-area">
             <div id="number-wheel">🎰</div>
-            <input type="number" id="guessInput" placeholder="Enter your guess" class="glow-input">
-            <button id="guessButton" class="fun-button">🎯 Guess!</button>
+            <input type="number" id="guessInput" placeholder="Enter your guess">
+            <button id="guessButton">🎯 Guess!</button>
             <div id="hint-container">
                 <p id="message"></p>
                 <p id="hint"></p>
@@ -54,45 +54,47 @@
         </div>
 
         <div id="shop-and-achievements">
-            <div class="tabs">
-                <button class="tab-link active" onclick="openTab(event, 'upgrades-container')">🚀 Upgrades</button>
-                <button class="tab-link" onclick="openTab(event, 'miners-container')">⛏️ Miners</button>
-                <button class="tab-link" onclick="openTab(event, 'powerups-container')">⚡ Power-ups</button>
-                <button class="tab-link" onclick="openTab(event, 'minigames-container')">🎮 Mini-games</button>
-                <button class="tab-link" onclick="openTab(event, 'achievements-container')">🏆 Achievements</button>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="openTab(event, 'upgrades-container')">🚀 Upgrades</button>
+                    <button class="tab-btn" onclick="openTab(event, 'miners-container')">⛏️ Miners</button>
+                    <button class="tab-btn" onclick="openTab(event, 'powerups-container')">⚡ Power-ups</button>
+                    <button class="tab-btn" onclick="openTab(event, 'minigames-container')">🎮 Mini-games</button>
+                    <button class="tab-btn" onclick="openTab(event, 'achievements-container')">🏆 Achievements</button>
+                </div>
             </div>
 
             <div id="upgrades-container" class="tab-content" style="display: block;">
                 <div id="upgrades-grid">
-                    <button id="bigger-payout" class="upgrade-btn bounce-hover">
+                    <button id="bigger-payout" class="upgrade-btn">
                         💰 Increase Payout<br>
                         <small>Cost: $<span class="cost">10</span> | Level <span class="level">1</span></small>
                     </button>
-                    <button id="lucky-bonus" class="upgrade-btn bounce-hover">
+                    <button id="lucky-bonus" class="upgrade-btn">
                         🍀 Lucky Bonus<br>
                         <small>Cost: $<span class="cost">25</span> | Level <span class="level">0</span></small>
                     </button>
-                    <button id="range-reducer" class="upgrade-btn bounce-hover">
+                    <button id="range-reducer" class="upgrade-btn">
                         📉 Reduce Range<br>
                         <small>Cost: $<span class="cost">50</span> | Level <span class="level">0</span></small>
                     </button>
-                    <button id="hint-power" class="upgrade-btn bounce-hover">
+                    <button id="hint-power" class="upgrade-btn">
                         💡 Hint Power<br>
                         <small>Cost: $<span class="cost">75</span> | Level <span class="level">0</span></small>
                     </button>
-                    <button id="bigger-range" class="upgrade-btn bounce-hover">
+                    <button id="bigger-range" class="upgrade-btn">
                         📈 Bigger Range<br>
                         <small>Cost: $<span class="cost">150</span> | Level <span class="level">0</span></small>
                     </button>
-                    <button id="streak-multiplier" class="upgrade-btn bounce-hover">
+                    <button id="streak-multiplier" class="upgrade-btn">
                         🔥 Streak Multiplier<br>
                         <small>Cost: $<span class="cost">100</span> | Level <span class="level">0</span></small>
                     </button>
-                    <button id="auto-guesser" class="upgrade-btn bounce-hover">
+                    <button id="auto-guesser" class="upgrade-btn">
                         🤖 Auto Guesser<br>
                         <small>Cost: $<span class="cost">500</span> | Level <span class="level">0</span></small>
                     </button>
-                    <button id="prestige" class="upgrade-btn prestige-btn rainbow-border">
+                    <button id="prestige" class="upgrade-btn prestige-btn">
                         ⭐ Prestige<br>
                         <small>Reset for permanent bonuses!</small>
                     </button>
@@ -101,17 +103,17 @@
 
             <div id="miners-container" class="tab-content">
                 <div id="miners-grid">
-                    <button id="bronze-miner" class="miner-btn bounce-hover">
+                    <button id="bronze-miner" class="miner-btn">
                         🥉 Bronze Miner<br>
                         <small>Generates $1/sec</small>
                         <small>Cost: $<span class="cost">20</span> | Owned: <span class="owned">0</span></small>
                     </button>
-                    <button id="silver-miner" class="miner-btn bounce-hover">
+                    <button id="silver-miner" class="miner-btn">
                         🥈 Silver Miner<br>
                         <small>Generates $10/sec</small>
                         <small>Cost: $<span class="cost">1000</span> | Owned: <span class="owned">0</span></small>
                     </button>
-                    <button id="gold-miner" class="miner-btn bounce-hover">
+                    <button id="gold-miner" class="miner-btn">
                         🥇 Gold Miner<br>
                         <small>Generates $100/sec</small>
                         <small>Cost: $<span class="cost">10000</span> | Owned: <span class="owned">0</span></small>
@@ -121,22 +123,22 @@
 
             <div id="powerups-container" class="tab-content">
                 <div class="powerups-grid">
-                    <button id="double-or-nothing-btn" class="powerup-btn bounce-hover" onclick="activateDoubleOrNothing()">
+                    <button id="double-or-nothing-btn" class="powerup-btn" onclick="activateDoubleOrNothing()">
                         🎲 Double or Nothing<br>
                         <small>Next guess: 2x money or lose half!</small>
                         <small id="don-cooldown"></small>
                     </button>
-                    <button id="lucky-draw-btn" class="powerup-btn bounce-hover" onclick="activateLuckyDraw()">
+                    <button id="lucky-draw-btn" class="powerup-btn" onclick="activateLuckyDraw()">
                         🍀 Lucky Draw<br>
                         <small>Random prize or effect!</small>
                         <small id="ld-cooldown"></small>
                     </button>
-                    <button id="time-freeze-btn" class="powerup-btn bounce-hover" onclick="activateTimeFreeze()">
+                    <button id="time-freeze-btn" class="powerup-btn" onclick="activateTimeFreeze()">
                         ⏰ Time Freeze<br>
                         <small>Pause all timers for 30s</small>
                         <small id="tf-cooldown"></small>
                     </button>
-                    <button id="number-magnet-btn" class="powerup-btn bounce-hover" onclick="activateNumberMagnet()">
+                    <button id="number-magnet-btn" class="powerup-btn" onclick="activateNumberMagnet()">
                         🧲 Number Magnet<br>
                         <small>Get attracted to the correct number!</small>
                         <small id="nm-cooldown"></small>
@@ -146,22 +148,22 @@
 
             <div id="minigames-container" class="tab-content">
                 <div class="minigames-grid">
-                    <button id="spin-wheel-btn" class="minigame-btn bounce-hover" onclick="spinTheWheel()">
+                    <button id="spin-wheel-btn" class="minigame-btn" onclick="spinTheWheel()">
                         🎰 Spin the Wheel<br>
                         <small>Cost: $<span class="cost">25</span></small>
                         <small>Win up to $1500!</small>
                     </button>
-                    <button id="slot-machine-btn" class="minigame-btn bounce-hover" onclick="playSlotMachine()">
+                    <button id="slot-machine-btn" class="minigame-btn" onclick="playSlotMachine()">
                         🎰 Slot Machine<br>
                         <small>Cost: $<span class="cost">50</span></small>
                         <small>Match symbols for big wins!</small>
                     </button>
-                    <button id="number-bingo-btn" class="minigame-btn bounce-hover" onclick="startNumberBingo()">
+                    <button id="number-bingo-btn" class="minigame-btn" onclick="startNumberBingo()">
                         🎯 Number Bingo<br>
                         <small>Cost: $<span class="cost">100</span></small>
                         <small>Complete a line for jackpot!</small>
                     </button>
-                    <button id="rapid-fire-btn" class="minigame-btn bounce-hover" onclick="startRapidFire()">
+                    <button id="rapid-fire-btn" class="minigame-btn" onclick="startRapidFire()">
                         ⚡ Rapid Fire<br>
                         <small>Cost: $<span class="cost">75</span></small>
                         <small>30 seconds of speed guessing!</small>
