@@ -266,8 +266,6 @@ let autoGuesserInterval;
 // Initialize game
 function initGame() {
     updateDisplay();
-    updateUpgradeButtons();
-    updateMinerButtons();
     renderAchievements();
     updateFunFact();
     updateCooldownDisplays();
@@ -280,6 +278,21 @@ function initGame() {
             makeGuess();
         }
     });
+
+    // Wire up upgrade buttons
+    document.getElementById('bigger-payout').addEventListener('click', upgradeBiggerPayout);
+    document.getElementById('lucky-bonus').addEventListener('click', upgradeLuckyBonus);
+    document.getElementById('range-reducer').addEventListener('click', upgradeRangeReducer);
+    document.getElementById('hint-power').addEventListener('click', upgradeHintPower);
+    document.getElementById('bigger-range').addEventListener('click', upgradeBiggerRange);
+    document.getElementById('streak-multiplier').addEventListener('click', upgradeStreakMultiplier);
+    document.getElementById('auto-guesser').addEventListener('click', upgradeAutoGuesser);
+    document.getElementById('prestige').addEventListener('click', applyPrestige);
+
+    // Wire up miner buttons
+    document.getElementById('bronze-miner').addEventListener('click', buyBronzeMiner);
+    document.getElementById('silver-miner').addEventListener('click', buySilverMiner);
+    document.getElementById('gold-miner').addEventListener('click', buyGoldMiner);
 
     // Update fun fact every 10 seconds
     setInterval(updateFunFact, 10000);
@@ -299,11 +312,24 @@ function initGame() {
     
     // Add click handler for number wheel
     numberWheel.addEventListener('click', () => {
-        numberWheel.style.animation = 'spin 0.5s ease-out';
-        setTimeout(() => {
-            numberWheel.style.animation = 'spin 4s linear infinite';
-        }, 500);
-        updateFunFact();
+        if (numberWheel.classList.contains('spinning')) return;
+
+        numberWheel.classList.add('spinning');
+        numberWheel.style.animation = 'spin 1s ease-out';
+        
+        let spinCount = 0;
+        const spinInterval = setInterval(() => {
+            numberWheel.textContent = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
+            spinCount++;
+            if (spinCount > 20) { // Spin for a bit
+                clearInterval(spinInterval);
+                randomNumber = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
+                numberWheel.textContent = '🎰';
+                showHint(`A new number has been chosen! Good luck!`);
+                numberWheel.style.animation = '';
+                numberWheel.classList.remove('spinning');
+            }
+        }, 50);
     });
 }
 
@@ -315,6 +341,90 @@ function updateDisplay() {
     totalGuessesDisplay.textContent = totalGuesses;
     accuracyDisplay.textContent = totalGuesses > 0 ? Math.round((correctGuesses / totalGuesses) * 100) + '%' : '0%';
     rangeDisplay.textContent = `${gameSettings.minNumber} and ${gameSettings.maxNumber}`;
+    updateUpgradeButtons();
+    updateMinerButtons();
+}
+
+function updateUpgradeButtons() {
+    // bigger-payout
+    const bpBtn = document.getElementById('bigger-payout');
+    bpBtn.querySelector('.cost').textContent = upgrades.biggerPayout.cost;
+    bpBtn.querySelector('.level').textContent = upgrades.biggerPayout.level;
+    bpBtn.disabled = money < upgrades.biggerPayout.cost;
+
+    // lucky-bonus
+    const lbBtn = document.getElementById('lucky-bonus');
+    lbBtn.querySelector('.cost').textContent = upgrades.luckyBonus.cost;
+    lbBtn.querySelector('.level').textContent = upgrades.luckyBonus.level;
+    lbBtn.disabled = money < upgrades.luckyBonus.cost;
+
+    // range-reducer
+    const rrBtn = document.getElementById('range-reducer');
+    rrBtn.querySelector('.cost').textContent = upgrades.rangeReducer.cost;
+    rrBtn.querySelector('.level').textContent = upgrades.rangeReducer.level;
+    rrBtn.disabled = money < upgrades.rangeReducer.cost;
+
+    // hint-power
+    const hpBtn = document.getElementById('hint-power');
+    hpBtn.querySelector('.cost').textContent = upgrades.hintPower.cost;
+    hpBtn.querySelector('.level').textContent = upgrades.hintPower.level;
+    hpBtn.disabled = money < upgrades.hintPower.cost;
+
+    // bigger-range
+    const brBtn = document.getElementById('bigger-range');
+    brBtn.querySelector('.cost').textContent = upgrades.biggerRange.cost;
+    brBtn.querySelector('.level').textContent = upgrades.biggerRange.level;
+    brBtn.disabled = money < upgrades.biggerRange.cost;
+
+    // streak-multiplier
+    const smBtn = document.getElementById('streak-multiplier');
+    smBtn.querySelector('.cost').textContent = upgrades.streakMultiplier.cost;
+    smBtn.querySelector('.level').textContent = upgrades.streakMultiplier.level;
+    smBtn.disabled = money < upgrades.streakMultiplier.cost;
+
+    // auto-guesser
+    const agBtn = document.getElementById('auto-guesser');
+    agBtn.querySelector('.cost').textContent = upgrades.autoGuesser.cost;
+    agBtn.querySelector('.level').textContent = upgrades.autoGuesser.level;
+    agBtn.disabled = money < upgrades.autoGuesser.cost;
+    
+    // prestige
+    document.getElementById('prestige').disabled = money < gameSettings.prestigeRequirement;
+}
+
+function updateMinerButtons() {
+    // bronze-miner
+    const bmBtn = document.getElementById('bronze-miner');
+    bmBtn.querySelector('.cost').textContent = miners.bronze.cost;
+    bmBtn.querySelector('.owned').textContent = miners.bronze.owned;
+    bmBtn.disabled = money < miners.bronze.cost;
+
+    // silver-miner
+    const smBtn = document.getElementById('silver-miner');
+    smBtn.querySelector('.cost').textContent = miners.silver.cost;
+    smBtn.querySelector('.owned').textContent = miners.silver.owned;
+    smBtn.disabled = money < miners.silver.cost;
+
+    // gold-miner
+    const gmBtn = document.getElementById('gold-miner');
+    gmBtn.querySelector('.cost').textContent = miners.gold.cost;
+    gmBtn.querySelector('.owned').textContent = miners.gold.owned;
+    gmBtn.disabled = money < miners.gold.cost;
+}
+
+function renderAchievements() {
+    const achievementsList = document.getElementById('achievements-list');
+    achievementsList.innerHTML = '';
+    achievements.forEach(ach => {
+        const achDiv = document.createElement('div');
+        achDiv.className = 'achievement';
+        achDiv.setAttribute('data-id', ach.id);
+        if (ach.unlocked) {
+            achDiv.classList.add('unlocked');
+        }
+        achDiv.innerHTML = `<strong>${ach.name}</strong><br><small>${ach.description}</small>`;
+        achievementsList.appendChild(achDiv);
+    });
 }
 
 function calculatePayout() {
@@ -364,6 +474,22 @@ function makeGuess() {
         
         let payout = calculatePayout();
         
+        // Add a small chance for a "Critical Hit"
+        if (Math.random() < 0.05) { // 5% chance
+            payout *= 10; // 10x multiplier!
+            showHint("💥 CRITICAL HIT! 10x MONEY!");
+            const rect = guessButton.getBoundingClientRect();
+            const critEffect = document.createElement('div');
+            critEffect.className = 'floating-money-particle critical-strike';
+            critEffect.textContent = `💥 x10! +$${payout}`;
+            critEffect.style.left = (rect.left + rect.width / 2) + 'px';
+            critEffect.style.top = (rect.top - 30) + 'px';
+            critEffect.style.fontSize = '2em';
+            document.getElementById('floating-money').appendChild(critEffect);
+            setTimeout(() => critEffect.remove(), 3000);
+            screenShake();
+        }
+
         // Apply rapid fire bonus
         if (rapidFireBonus > 0) {
             payout = Math.floor(payout * (1 + rapidFireBonus));
@@ -421,7 +547,8 @@ function makeGuess() {
         
         // Chance to trigger special events
         if (Math.random() < 0.1) activateNumberRush();
-        
+        if (Math.random() < 0.08) spawnMysteryBox(); // 8% chance for a mystery box
+
         // Generate new number
         randomNumber = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
         
@@ -488,7 +615,7 @@ function openTab(evt, tabName) {
     for (i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
-    tablinks = document.getElementsByClassName("tab-link");
+    tablinks = document.getElementsByClassName("tab-btn");
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
@@ -533,6 +660,81 @@ function updateCooldownDisplays() {
 }
 
 // Additional mini-games
+function spinTheWheel() {
+    if (money < miniGames.spinTheWheel.cost) {
+        showHint(`Need $${miniGames.spinTheWheel.cost} to spin the wheel!`);
+        return;
+    }
+    money -= miniGames.spinTheWheel.cost;
+    achievementCounters.miniGamesPlayed++;
+    achievementCounters.wheelSpins++;
+
+    const prizes = [
+        { value: 0, text: 'Nothing' },
+        { value: 10, text: '$10' },
+        { value: 50, text: '$50' },
+        { value: 100, text: '$100' },
+        { value: 250, text: '$250' },
+        { value: 500, text: '$500' },
+        { value: 1500, text: 'JACKPOT! $1500' }
+    ];
+    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+
+    showHint('🎡 Spinning the wheel...');
+    setTimeout(() => {
+        showHint(`The wheel landed on: ${prize.text}!`);
+        if (prize.value > 0) {
+            money += prize.value;
+            createFloatingMoney(prize.value, window.innerWidth / 2, window.innerHeight / 2);
+            if (prize.value >= 1500) {
+                createConfetti('mega');
+                screenShake();
+            }
+        }
+        updateDisplay();
+    }, 2000);
+}
+
+function playSlotMachine() {
+    if (money < miniGames.slotMachine.cost) {
+        showHint(`Need $${miniGames.slotMachine.cost} to play the slots!`);
+        return;
+    }
+    money -= miniGames.slotMachine.cost;
+    achievementCounters.miniGamesPlayed++;
+
+    const reels = ['🍒', '🍋', '🍊', '🍉', '⭐', '💰'];
+    const reel1 = reels[Math.floor(Math.random() * reels.length)];
+    const reel2 = reels[Math.floor(Math.random() * reels.length)];
+    const reel3 = reels[Math.floor(Math.random() * reels.length)];
+
+    showHint(`🎰 Spinning... [${reel1}] [${reel2}] [${reel3}]`);
+
+    let winnings = 0;
+    if (reel1 === reel2 && reel2 === reel3) {
+        if (reel1 === '💰') {
+            winnings = 10000; // Jackpot
+            showHint('💰💰💰 JACKPOT! YOU WON $10,000!');
+            createConfetti('mega');
+            screenShake();
+            achievementCounters.slotJackpots++;
+        } else {
+            winnings = 1000;
+            showHint(`🎉 Winner! You won $1000!`);
+        }
+    } else if (reel1 === reel2 || reel2 === reel3 || reel1 === reel3) {
+        winnings = 100;
+        showHint(`👍 Nice! You won $100!`);
+    } else {
+        showHint('😢 Better luck next time!');
+    }
+
+    if (winnings > 0) {
+        money += winnings;
+        createFloatingMoney(winnings, window.innerWidth / 2, window.innerHeight / 2);
+    }
+}
+
 function startNumberBingo() {
     if (money < 100) { // Reduced from 200 to 100
         showHint("Need $100 to play Number Bingo!");
@@ -610,6 +812,57 @@ function startRapidFire() {
 }
 
 // Advanced power-ups
+function activateDoubleOrNothing() {
+    if (powerUps.doubleOrNothing.cooldown > 0) {
+        showHint(`🎲 Double or Nothing on cooldown: ${powerUps.doubleOrNothing.cooldown}s`);
+        return;
+    }
+    powerUps.doubleOrNothing.active = true;
+    powerUps.doubleOrNothing.cooldown = 60; // 1 minute cooldown
+    showHint("🎲 Double or Nothing activated! Your next guess is all or nothing!");
+    createPowerUpEffect('doubleOrNothing', window.innerWidth / 2, 200);
+    achievementCounters.powerUpsUsed++;
+}
+
+function activateLuckyDraw() {
+    if (powerUps.luckyDraw.cooldown > 0) {
+        showHint(`🍀 Lucky Draw on cooldown: ${powerUps.luckyDraw.cooldown}s`);
+        return;
+    }
+    powerUps.luckyDraw.cooldown = 90; // 1.5 minute cooldown
+    showHint("🍀 Lucky Draw! Let's see what you get...");
+    createPowerUpEffect('luckyDraw', window.innerWidth / 2, 200);
+    
+    const prizes = [
+        { type: 'money', value: Math.floor(money * 0.25), text: `You won $${Math.floor(money * 0.25)}!` },
+        { type: 'money', value: 1000, text: 'You won $1000!' },
+        { type: 'prestige', value: 1, text: 'You won 1 Prestige Point! ⭐' },
+        { type: 'event', event: 'goldenNumber', text: 'A Golden Number has appeared!' },
+        { type: 'event', event: 'numberRush', text: 'Number Rush activated!' },
+        { type: 'dud', text: 'Nothing this time. Better luck next time!' }
+    ];
+    
+    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+    
+    setTimeout(() => {
+        showHint(`🍀 ${prize.text}`);
+        if (prize.type === 'money') {
+            money += prize.value;
+            createFloatingMoney(prize.value, window.innerWidth / 2, window.innerHeight / 2);
+        } else if (prize.type === 'prestige') {
+            prestigePoints += prize.value;
+        } else if (prize.type === 'event') {
+            if (prize.event === 'goldenNumber') spawnGoldenNumber(true);
+            if (prize.event === 'numberRush') activateNumberRush();
+        }
+        updateDisplay();
+    }, 1500);
+    achievementCounters.powerUpsUsed++;
+    if (prize.type !== 'dud') {
+        achievementCounters.luckyDrawWins++;
+    }
+}
+
 function activateTimeFreeze() {
     if (powerUps.timeFreeze.cooldown > 0) {
         showHint(`⏰ Time Freeze on cooldown: ${powerUps.timeFreeze.cooldown}s`);
@@ -869,13 +1122,106 @@ function checkAchievements() {
 
 function unlockAchievement(id) {
     const achievement = achievements.find(a => a.id === id);
-    if (achievement) {
+    if (achievement && !achievement.unlocked) {
         achievement.unlocked = true;
-        showHint(`🎉 Achievement unlocked: ${achievement.name}! ${achievement.description}`);
+        showHint(`🎉 Achievement unlocked: ${achievement.name}!`);
         
-        // Update achievements display
-        renderAchievements();
+        // Update achievements display and add glow effect
+        const achDiv = achievementsList.querySelector(`[data-id='${id}']`);
+        if (achDiv) {
+            achDiv.classList.add('unlocked', 'new-unlock');
+            // Remove the glow after the animation ends
+            setTimeout(() => {
+                achDiv.classList.remove('new-unlock');
+            }, 2000);
+        }
     }
+}
+
+// Special Events
+function spawnGoldenNumber(force = false) {
+    if (specialEvents.goldenNumber.active && !force) return;
+    
+    specialEvents.goldenNumber.active = true;
+    specialEvents.goldenNumber.number = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
+    
+    const gameArea = document.getElementById('game-area');
+    gameArea.classList.add('golden-number-indicator');
+    showHint(`✨ A Golden Number has appeared! Guess ${specialEvents.goldenNumber.number} for a 5x bonus!`);
+    
+    setTimeout(() => {
+        if (specialEvents.goldenNumber.active) {
+            specialEvents.goldenNumber.active = false;
+            gameArea.classList.remove('golden-number-indicator');
+        }
+    }, 15000); // Lasts for 15 seconds
+}
+
+function activateNumberRush() {
+    if (specialEvents.numberRush.active) return;
+
+    specialEvents.numberRush.active = true;
+    specialEvents.numberRush.timeLeft = 20; // 20 seconds
+    
+    const gameArea = document.getElementById('game-area');
+    gameArea.classList.add('number-rush-indicator');
+    showHint(`🔥 NUMBER RUSH! All payouts are doubled for 20 seconds!`);
+
+    const rushInterval = setInterval(() => {
+        specialEvents.numberRush.timeLeft--;
+        if (specialEvents.numberRush.timeLeft <= 0) {
+            clearInterval(rushInterval);
+            specialEvents.numberRush.active = false;
+            gameArea.classList.remove('number-rush-indicator');
+            showHint('Number Rush has ended.');
+        }
+    }, 1000);
+}
+
+function spawnMysteryBox() {
+    if (document.getElementById('mystery-box')) return; // Only one at a time
+
+    const box = document.createElement('div');
+    box.id = 'mystery-box';
+    box.textContent = '🎁';
+    box.style.position = 'fixed';
+    box.style.left = `${10 + Math.random() * 80}%`;
+    box.style.top = `${20 + Math.random() * 60}%`;
+    box.style.fontSize = '3rem';
+    box.style.cursor = 'pointer';
+    box.style.transition = 'transform 0.2s ease';
+    box.addEventListener('mouseover', () => box.style.transform = 'scale(1.2)');
+    box.addEventListener('mouseout', () => box.style.transform = 'scale(1)');
+
+    box.addEventListener('click', () => {
+        const prizes = [
+            { type: 'money', value: Math.floor(money * 0.5), text: `You found $${Math.floor(money * 0.5)}!` },
+            { type: 'money', value: 5000, text: 'You found $5000!' },
+            { type: 'prestige', value: 1, text: 'You found 1 Prestige Point! ⭐' },
+            { type: 'upgrade', text: 'You got a free random upgrade level!' }
+        ];
+        const prize = prizes[Math.floor(Math.random() * prizes.length)];
+
+        showHint(`🎁 Mystery Box: ${prize.text}`);
+        if (prize.type === 'money') {
+            money += prize.value;
+            createFloatingMoney(prize.value, parseFloat(box.style.left), parseFloat(box.style.top));
+        } else if (prize.type === 'prestige') {
+            prestigePoints += prize.value;
+        } else if (prize.type === 'upgrade') {
+            const allUpgrades = Object.keys(upgrades);
+            const randomUpgradeKey = allUpgrades[Math.floor(Math.random() * allUpgrades.length)];
+            upgrades[randomUpgradeKey].level++;
+        }
+        updateDisplay();
+        box.remove();
+    }, { once: true });
+
+    document.body.appendChild(box);
+
+    setTimeout(() => {
+        box.remove(); // Disappears if not clicked
+    }, 8000);
 }
 
 // Show hint messages
@@ -903,7 +1249,6 @@ function upgradeBiggerPayout() {
     upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level - 1));
     
     updateDisplay();
-    updateUpgradeButtons();
 }
 
 function upgradeLuckyBonus() {
@@ -920,7 +1265,6 @@ function upgradeLuckyBonus() {
     upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level - 1));
     
     updateDisplay();
-    updateUpgradeButtons();
 }
 
 function upgradeRangeReducer() {
@@ -943,7 +1287,6 @@ function upgradeRangeReducer() {
     }
     
     updateDisplay();
-    updateUpgradeButtons();
 }
 
 function upgradeHintPower() {
@@ -960,7 +1303,6 @@ function upgradeHintPower() {
     upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level - 1));
     
     updateDisplay();
-    updateUpgradeButtons();
 }
 
 function upgradeBiggerRange() {
@@ -981,7 +1323,6 @@ function upgradeBiggerRange() {
     gameSettings.maxNumber += 3; // Increased expansion for more reward
     
     updateDisplay();
-    updateUpgradeButtons();
 }
 
 function upgradeStreakMultiplier() {
@@ -998,300 +1339,82 @@ function upgradeStreakMultiplier() {
     upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level - 1));
     
     updateDisplay();
-    updateUpgradeButtons();
 }
 
 function upgradeAutoGuesser() {
     const upgrade = upgrades.autoGuesser;
-    
     if (money < upgrade.cost) {
         message.textContent = `Not enough money! (${upgrade.cost})`;
         message.style.color = '#ff6b6b';
         return;
     }
-    
     money -= upgrade.cost;
     upgrade.level++;
-    upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level - 1));
+    upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(2, upgrade.level - 1)); // Steeper cost curve for auto-guesser
     
+    if (!autoGuesserActive) {
+        autoGuesserActive = true;
+        autoGuesserInterval = setInterval(autoGuess, 5000); // Guess every 5 seconds
+    } else {
+        // Improve it: make it faster
+        clearInterval(autoGuesserInterval);
+        const newInterval = Math.max(5000 - (upgrade.level * 500), 1000); // Max speed of 1 guess/sec
+        autoGuesserInterval = setInterval(autoGuess, newInterval);
+    }
+
     updateDisplay();
-    updateUpgradeButtons();
+}
+
+function autoGuess() {
+    if (!autoGuesserActive) return;
+    // A simple random guess strategy for the auto-guesser
+    const guess = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
+    guessInput.value = guess;
+    makeGuess();
 }
 
 // Miner functions
 function buyBronzeMiner() {
     const miner = miners.bronze;
-    
     if (money < miner.cost) {
         message.textContent = `Not enough money! (${miner.cost})`;
         message.style.color = '#ff6b6b';
         return;
     }
-    
     money -= miner.cost;
     miner.owned++;
-    miner.cost = Math.floor(miner.baseCost * Math.pow(1.5, miner.owned - 1));
-    
+    incomePerSecond += miner.income;
+    miner.cost = Math.floor(miner.baseCost * Math.pow(1.15, miner.owned));
     updateDisplay();
-    updateMinerButtons();
 }
 
 function buySilverMiner() {
     const miner = miners.silver;
-    
     if (money < miner.cost) {
         message.textContent = `Not enough money! (${miner.cost})`;
         message.style.color = '#ff6b6b';
         return;
     }
-    
     money -= miner.cost;
     miner.owned++;
-    miner.cost = Math.floor(miner.baseCost * Math.pow(1.5, miner.owned - 1));
-    
+    incomePerSecond += miner.income;
+    miner.cost = Math.floor(miner.baseCost * Math.pow(1.2, miner.owned));
     updateDisplay();
-    updateMinerButtons();
 }
 
 function buyGoldMiner() {
     const miner = miners.gold;
-    
     if (money < miner.cost) {
         message.textContent = `Not enough money! (${miner.cost})`;
         message.style.color = '#ff6b6b';
         return;
     }
-    
     money -= miner.cost;
     miner.owned++;
-    miner.cost = Math.floor(miner.baseCost * Math.pow(1.5, miner.owned - 1));
-    
-    updateDisplay();
-    updateMinerButtons();
-}
-
-// Update upgrade buttons
-function updateUpgradeButtons() {
-    for (let key in upgrades) {
-        const upgrade = upgrades[key];
-        const button = document.getElementById(`${key}Button`);
-        
-        if (button) {
-            button.textContent = `Upgrade ${key.replace(/([A-Z])/g, ' $1')}: Level ${upgrade.level} (Cost: $${upgrade.cost})`;
-            button.disabled = money < upgrade.cost;
-        }
-    }
-}
-
-// Update miner buttons
-function updateMinerButtons() {
-    for (let key in miners) {
-        const miner = miners[key];
-        const button = document.getElementById(`${key}Button`);
-        
-        if (button) {
-            button.textContent = `Buy ${key.charAt(0).toUpperCase() + key.slice(1)} Miner: ${miner.owned} owned (Cost: $${miner.cost})`;
-            button.disabled = money < miner.cost;
-        }
-    }
-}
-
-// Render achievements
-function renderAchievements() {
-    const achievementsContainer = document.getElementById('achievements-container');
-    achievementsContainer.innerHTML = '';
-    
-    achievements.forEach(achievement => {
-        const achievementElement = document.createElement('div');
-        achievementElement.className = 'achievement';
-        achievementElement.textContent = achievement.name;
-        
-        if (achievement.unlocked) {
-            achievementElement.classList.add('unlocked');
-        }
-        
-        achievementsContainer.appendChild(achievementElement);
-    });
-}
-
-// Mini-game: Spin the Wheel
-function spinTheWheel() {
-    if (money < miniGames.spinTheWheel.cost) {
-        showHint(`Need $${miniGames.spinTheWheel.cost} to spin the wheel!`);
-        return;
-    }
-    
-    money -= miniGames.spinTheWheel.cost;
-    const prizes = [0, 50, 100, 200, 400, 800, 1500]; // Increased all prizes
-    const weights = [15, 25, 25, 15, 10, 7, 3]; // Reduced chance of getting nothing
-    
-    const randomNum = Math.random() * 100;
-    let cumulative = 0;
-    let prize = 0;
-    
-    for (let i = 0; i < weights.length; i++) {
-        cumulative += weights[i];
-        if (randomNum <= cumulative) {
-            prize = prizes[i];
-            break;
-        }
-    }
-    
-    if (prize === 0) {
-        showHint("🎰 Better luck next time! You got nothing.");
-    } else {
-        money += prize;
-        showHint(`🎰 Wheel spun! You won $${prize}!`);
-        createFloatingMoney(prize, window.innerWidth / 2, window.innerHeight / 2);
-    }
-    
+    incomePerSecond += miner.income;
+    miner.cost = Math.floor(miner.baseCost * Math.pow(1.25, miner.owned));
     updateDisplay();
 }
 
-// Mini-game: Slot Machine
-function playSlotMachine() {
-    if (money < miniGames.slotMachine.cost) {
-        showHint(`Need $${miniGames.slotMachine.cost} to play slots!`);
-        return;
-    }
-    
-    money -= miniGames.slotMachine.cost;
-    const symbols = ['🍒', '🍋', '🍊', '🔔', '⭐', '💎'];
-    const reels = [];
-    
-    for (let i = 0; i < 3; i++) {
-        reels.push(symbols[Math.floor(Math.random() * symbols.length)]);
-    }
-    
-    let winAmount = 0;
-    
-    // Check for wins
-    if (reels[0] === reels[1] && reels[1] === reels[2]) {
-        // Three of a kind - increased multipliers
-        const multipliers = { '🍒': 8, '🍋': 12, '🍊': 15, '🔔': 20, '⭐': 35, '💎': 75 };
-        winAmount = miniGames.slotMachine.cost * multipliers[reels[0]];
-        showHint(`🎰 JACKPOT! ${reels.join(' ')} - You won $${winAmount}!`);
-        createConfetti('golden');
-    } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
-        // Two of a kind - increased multiplier
-        winAmount = miniGames.slotMachine.cost * 3; // Increased from 2x to 3x
-        showHint(`🎰 Two match! ${reels.join(' ')} - You won $${winAmount}!`);
-    } else {
-        showHint(`🎰 ${reels.join(' ')} - No match this time!`);
-    }
-    
-    money += winAmount;
-    updateDisplay();
-}
-
-// Special Event: Golden Number
-function spawnGoldenNumber() {
-    if (Math.random() < 0.5) { // Increased from 30% to 50% chance
-        specialEvents.goldenNumber.active = true;
-        specialEvents.goldenNumber.number = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
-        
-        showHint(`✨ GOLDEN NUMBER APPEARED! If you guess ${specialEvents.goldenNumber.number}, you'll get 5x money!`);
-        
-        // Auto-disable after 45 seconds (increased from 30)
-        setTimeout(() => {
-            if (specialEvents.goldenNumber.active) {
-                specialEvents.goldenNumber.active = false;
-                showHint("⏰ Golden number expired!");
-            }
-        }, 45000);
-    }
-}
-
-// Special Event: Number Rush Mode
-function activateNumberRush() {
-    if (Math.random() < 0.4) { // Increased from 20% to 40% chance
-        specialEvents.numberRush.active = true;
-        specialEvents.numberRush.timeLeft = 45; // Increased from 30 to 45 seconds
-        
-        showHint("🚀 NUMBER RUSH! Double money for 45 seconds!");
-        
-        const rushTimer = setInterval(() => {
-            specialEvents.numberRush.timeLeft--;
-            
-            if (specialEvents.numberRush.timeLeft <= 0) {
-                specialEvents.numberRush.active = false;
-                showHint("⏰ Number Rush ended!");
-                clearInterval(rushTimer);
-            }
-        }, 1000);
-    }
-}
-
-// Power-up: Double or Nothing
-function activateDoubleOrNothing() {
-    if (powerUps.doubleOrNothing.cooldown > 0) {
-        showHint(`🎲 Double or Nothing on cooldown: ${powerUps.doubleOrNothing.cooldown}s`);
-        return;
-    }
-    
-    powerUps.doubleOrNothing.active = true;
-    powerUps.doubleOrNothing.cooldown = 30; // Reduced from 60 to 30 second cooldown
-    
-    showHint("🎲 Double or Nothing activated! Next correct guess: 2x money or lose half!");
-    createPowerUpEffect('doubleOrNothing', window.innerWidth / 2, 200);
-}
-
-// Power-up: Lucky Draw
-function activateLuckyDraw() {
-    if (powerUps.luckyDraw.cooldown > 0) {
-        showHint(`🍀 Lucky Draw on cooldown: ${powerUps.luckyDraw.cooldown}s`);
-        return;
-    }
-    
-    const prizes = [
-        { name: "Money Boost", amount: 1000, emoji: "💰" }, // Increased from 500
-        { name: "Streak Shield", effect: "protectStreak", emoji: "🛡️" },
-        { name: "Range Hint", effect: "rangeHint", emoji: "🎯" },
-        { name: "Double Income", effect: "doubleIncome", emoji: "⚡" },
-        { name: "Instant Win", effect: "instantWin", emoji: "🏆" },
-        { name: "Big Money Boost", amount: 2000, emoji: "💎" } // Added new bigger prize
-    ];
-    
-    const prize = prizes[Math.floor(Math.random() * prizes.length)];
-    
-    if (prize.amount) {
-        money += prize.amount;
-        showHint(`🍀 Lucky Draw: ${prize.emoji} ${prize.name} - $${prize.amount}!`);
-    } else {
-        applySpecialEffect(prize.effect);
-        showHint(`🍀 Lucky Draw: ${prize.emoji} ${prize.name}!`);
-    }
-    
-    powerUps.luckyDraw.cooldown = 45; // Reduced from 90 to 45 second cooldown
-    updateDisplay();
-}
-
-// Apply special effects from lucky draw
-function applySpecialEffect(effect) {
-    switch(effect) {
-        case 'protectStreak':
-            // Next wrong guess won't reset streak
-            showHint("🛡️ Your next wrong guess won't break your streak!");
-            break;
-        case 'rangeHint':
-            const hint = randomNumber <= (gameSettings.minNumber + gameSettings.maxNumber) / 2 ? 
-                         "lower half" : "upper half";
-            showHint(`🎯 Range Hint: The number is in the ${hint} of the range!`);
-            break;
-        case 'doubleIncome':
-            // Double passive income for 2 minutes
-            showHint("⚡ Double passive income for 2 minutes!");
-            break;
-        case 'instantWin':
-            showHint(`🏆 Instant Win! The number was ${randomNumber}!`);
-            // Trigger a correct guess
-            money += calculatePayout() * 2; // Double reward for instant win
-            correctGuesses++;
-            currentStreak++;
-            randomNumber = Math.floor(Math.random() * (gameSettings.maxNumber - gameSettings.minNumber + 1)) + gameSettings.minNumber;
-            break;
-    }
-}
-
-// Start the game
-initGame();
+// Call initGame when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', initGame);
