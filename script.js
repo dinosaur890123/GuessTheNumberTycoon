@@ -721,9 +721,7 @@ function spinTheWheel() {
     wheel.style.position = 'relative';
     wheel.style.overflow = 'hidden';
     wheel.style.boxShadow = '0 2px 12px rgba(66,153,225,0.15)';
-    wheel.style.display = 'flex';
-    wheel.style.alignItems = 'center';
-    wheel.style.justifyContent = 'center';
+    // Remove flex centering so SVG fills the div
 
     // Wheel segments
     const prizes = [
@@ -736,8 +734,9 @@ function spinTheWheel() {
         { value: 1500, text: 'JACKPOT! $1500', color: '#ffd700' }
     ];
     let wheelSVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    wheelSVG.setAttribute('width', '240');
-    wheelSVG.setAttribute('height', '240');
+    wheelSVG.setAttribute('width', '100%');
+    wheelSVG.setAttribute('height', '100%');
+    wheelSVG.setAttribute('viewBox', '0 0 240 240');
     let numSegments = prizes.length;
     let angle = 360 / numSegments;
     for (let i = 0; i < numSegments; i++) {
