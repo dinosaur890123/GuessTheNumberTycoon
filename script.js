@@ -354,43 +354,37 @@ function updateDisplay() {
 }
 
 function updateUpgradeButtons() {
-    // bigger-payout
+
     const bpBtn = document.getElementById('bigger-payout');
     bpBtn.querySelector('.cost').textContent = upgrades.biggerPayout.cost;
     bpBtn.querySelector('.level').textContent = upgrades.biggerPayout.level;
     bpBtn.disabled = money < upgrades.biggerPayout.cost;
-
-    // lucky-bonus
     const lbBtn = document.getElementById('lucky-bonus');
     lbBtn.querySelector('.cost').textContent = upgrades.luckyBonus.cost;
     lbBtn.querySelector('.level').textContent = upgrades.luckyBonus.level;
     lbBtn.disabled = money < upgrades.luckyBonus.cost;
 
-    // range-reducer
     const rrBtn = document.getElementById('range-reducer');
     rrBtn.querySelector('.cost').textContent = upgrades.rangeReducer.cost;
     rrBtn.querySelector('.level').textContent = upgrades.rangeReducer.level;
     rrBtn.disabled = money < upgrades.rangeReducer.cost;
 
-    // hint-power
     const hpBtn = document.getElementById('hint-power');
     hpBtn.querySelector('.cost').textContent = upgrades.hintPower.cost;
     hpBtn.querySelector('.level').textContent = upgrades.hintPower.level;
     hpBtn.disabled = money < upgrades.hintPower.cost;
 
-    // bigger-range
     const brBtn = document.getElementById('bigger-range');
     brBtn.querySelector('.cost').textContent = upgrades.biggerRange.cost;
     brBtn.querySelector('.level').textContent = upgrades.biggerRange.level;
     brBtn.disabled = money < upgrades.biggerRange.cost;
 
-    // streak-multiplier
+    // Streak multiplier and auto-guesser
     const smBtn = document.getElementById('streak-multiplier');
     smBtn.querySelector('.cost').textContent = upgrades.streakMultiplier.cost;
     smBtn.querySelector('.level').textContent = upgrades.streakMultiplier.level;
     smBtn.disabled = money < upgrades.streakMultiplier.cost;
 
-    // auto-guesser
     const agBtn = document.getElementById('auto-guesser');
     agBtn.querySelector('.cost').textContent = upgrades.autoGuesser.cost;
     agBtn.querySelector('.level').textContent = upgrades.autoGuesser.level;
@@ -468,8 +462,8 @@ function makeGuess() {
     const timeDiff = currentTime - lastGuessTime;
     lastGuessTime = currentTime;
     
-    // Rapid fire bonus (if guessing within 3 seconds)
-    if (timeDiff < 3000) {
+    // Rapid fire bonus (if guessing within 4 seconds)
+    if (timeDiff < 4000) {
         rapidFireBonus = Math.min(rapidFireBonus + 0.1, 2.0); // Max 2x bonus
     } else {
         rapidFireBonus = Math.max(rapidFireBonus - 0.05, 0);
@@ -530,7 +524,7 @@ function makeGuess() {
                 showHint("🎲 Double or Nothing: Lost half your money!");
             }
         }
-        
+                
         money += payout;
         totalMoneyEarned += payout; // Track for achievements
         
@@ -679,23 +673,120 @@ function spinTheWheel() {
     achievementCounters.miniGamesPlayed++;
     achievementCounters.wheelSpins++;
 
-    const prizes = [
-        { value: 0, text: 'Nothing' },
-        { value: 10, text: '$10' },
-        { value: 50, text: '$50' },
-        { value: 100, text: '$100' },
-        { value: 250, text: '$250' },
-        { value: 500, text: '$500' },
-        { value: 1500, text: 'JACKPOT! $1500' }
-    ];
-    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+    // Create modal
+    let modal = document.createElement('div');
+    modal.id = 'wheel-modal';
+    modal.style.position = 'fixed';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '2000';
 
-    showHint('🎡 Spinning the wheel...');
+    // Wheel visual
+    let wheelContainer = document.createElement('div');
+    wheelContainer.style.background = '#fff';
+    wheelContainer.style.borderRadius = '16px';
+    wheelContainer.style.padding = '32px';
+    wheelContainer.style.boxShadow = '0 4px 24px rgba(0,0,0,0.15)';
+    wheelContainer.style.textAlign = 'center';
+
+    let wheel = document.createElement('div');
+    wheel.id = 'wheel-visual';
+    wheel.style.width = '220px';
+    wheel.style.height = '220px';
+    wheel.style.borderRadius = '50%';
+    wheel.style.border = '8px solid #4299e1';
+    wheel.style.margin = '0 auto 24px auto';
+    wheel.style.position = 'relative';
+    wheel.style.overflow = 'hidden';
+    wheel.style.boxShadow = '0 2px 12px rgba(66,153,225,0.15)';
+
+    // Wheel segments
+    const prizes = [
+        { value: 0, text: 'Nothing', color: '#e2e8f0' },
+        { value: 10, text: '$10', color: '#90cdf4' },
+        { value: 50, text: '$50', color: '#f6e05e' },
+        { value: 100, text: '$100', color: '#68d391' },
+        { value: 250, text: '$250', color: '#fbb6ce' },
+        { value: 500, text: '$500', color: '#f56565' },
+        { value: 1500, text: 'JACKPOT! $1500', color: '#ffd700' }
+    ];
+    let wheelSVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    wheelSVG.setAttribute('width', '220');
+    wheelSVG.setAttribute('height', '220');
+    let numSegments = prizes.length;
+    let angle = 360 / numSegments;
+    for (let i = 0; i < numSegments; i++) {
+        let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        let startAngle = angle * i;
+        let endAngle = angle * (i + 1);
+        let largeArc = endAngle - startAngle > 180 ? 1 : 0;
+        let x1 = 110 + 100 * Math.cos(Math.PI * startAngle / 180);
+        let y1 = 110 + 100 * Math.sin(Math.PI * startAngle / 180);
+        let x2 = 110 + 100 * Math.cos(Math.PI * endAngle / 180);
+        let y2 = 110 + 100 * Math.sin(Math.PI * endAngle / 180);
+        let d = `M110,110 L${x1},${y1} A100,100 0 ${largeArc},1 ${x2},${y2} Z`;
+        path.setAttribute('d', d);
+        path.setAttribute('fill', prizes[i].color);
+        wheelSVG.appendChild(path);
+        // Add text label
+        let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        let labelAngle = startAngle + angle / 2;
+        let tx = 110 + 70 * Math.cos(Math.PI * labelAngle / 180);
+        let ty = 110 + 70 * Math.sin(Math.PI * labelAngle / 180);
+        text.setAttribute('x', tx);
+        text.setAttribute('y', ty);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-size', '1rem');
+        text.setAttribute('fill', '#2d3748');
+        text.textContent = prizes[i].text;
+        wheelSVG.appendChild(text);
+    }
+    wheel.appendChild(wheelSVG);
+
+    // Arrow
+    let arrow = document.createElement('div');
+    arrow.style.position = 'absolute';
+    arrow.style.top = '-24px';
+    arrow.style.left = 'calc(50% - 12px)';
+    arrow.style.width = '0';
+    arrow.style.height = '0';
+    arrow.style.borderLeft = '12px solid transparent';
+    arrow.style.borderRight = '12px solid transparent';
+    arrow.style.borderBottom = '24px solid #4299e1';
+    wheel.appendChild(arrow);
+
+    wheelContainer.appendChild(wheel);
+    let resultText = document.createElement('div');
+    resultText.style.fontSize = '1.25rem';
+    resultText.style.margin = '24px 0 0 0';
+    resultText.textContent = 'Spinning...';
+    wheelContainer.appendChild(resultText);
+
+    modal.appendChild(wheelContainer);
+    document.body.appendChild(modal);
+
+    // Animate wheel spin
+    let spinIndex = Math.floor(Math.random() * prizes.length);
+    let spins = 5; // Number of full spins
+    let totalAngle = 360 * spins + (360 - spinIndex * angle - angle / 2);
+    wheelSVG.style.transition = 'transform 2.2s cubic-bezier(.17,.67,.83,.67)';
     setTimeout(() => {
-        showHint(`The wheel landed on: ${prize.text}!`);
+        wheelSVG.style.transform = `rotate(${totalAngle}deg)`;
+    }, 100);
+
+    setTimeout(() => {
+        let prize = prizes[spinIndex];
+        resultText.textContent = `The wheel landed on: ${prize.text}!`;
         if (prize.value > 0) {
             money += prize.value;
-            totalMoneyEarned += prize.value; // Track for achievements
+            totalMoneyEarned += prize.value;
             createFloatingMoney(prize.value, window.innerWidth / 2, window.innerHeight / 2);
             if (prize.value >= 1500) {
                 createConfetti('mega');
@@ -703,7 +794,11 @@ function spinTheWheel() {
             }
         }
         updateDisplay();
-    }, 2000);
+        // Close modal after 2s
+        setTimeout(() => {
+            modal.remove();
+        }, 2000);
+    }, 2300);
 }
 
 function playSlotMachine() {
@@ -714,38 +809,118 @@ function playSlotMachine() {
     money -= miniGames.slotMachine.cost;
     achievementCounters.miniGamesPlayed++;
 
-    const reels = ['🍒', '🍋', '🍊', '🍉', '⭐', '💰'];
-    const reel1 = reels[Math.floor(Math.random() * reels.length)];
-    const reel2 = reels[Math.floor(Math.random() * reels.length)];
-    const reel3 = reels[Math.floor(Math.random() * reels.length)];
+    // Create modal
+    let modal = document.createElement('div');
+    modal.id = 'slot-modal';
+    modal.style.position = 'fixed';
+    modal.style.left = '0';
+    modal.style.top = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '2000';
 
-    showHint(`🎰 Spinning... [${reel1}] [${reel2}] [${reel3}]`);
+    let slotContainer = document.createElement('div');
+    slotContainer.style.background = '#fff';
+    slotContainer.style.borderRadius = '16px';
+    slotContainer.style.padding = '32px';
+    slotContainer.style.boxShadow = '0 4px 24px rgba(0,0,0,0.15)';
+    slotContainer.style.textAlign = 'center';
 
-    let winnings = 0;
-    if (reel1 === reel2 && reel2 === reel3) {
-        if (reel1 === '💰') {
-            winnings = 10000; // Jackpot
-            showHint('💰💰💰 JACKPOT! YOU WON $10,000!');
-            createConfetti('mega');
-            screenShake();
-            achievementCounters.slotJackpots++;
+    let slotTitle = document.createElement('div');
+    slotTitle.textContent = 'Slot Machine';
+    slotTitle.style.fontSize = '1.5rem';
+    slotTitle.style.marginBottom = '16px';
+    slotTitle.style.fontWeight = '700';
+    slotContainer.appendChild(slotTitle);
+
+    let reels = ['🍒', '🍋', '🍊', '🍉', '⭐', '💰'];
+    let reelDivs = [];
+    let reelsContainer = document.createElement('div');
+    reelsContainer.style.display = 'flex';
+    reelsContainer.style.justifyContent = 'center';
+    reelsContainer.style.gap = '24px';
+    reelsContainer.style.margin = '24px 0';
+    for (let i = 0; i < 3; i++) {
+        let reel = document.createElement('div');
+        reel.style.width = '64px';
+        reel.style.height = '64px';
+        reel.style.background = '#f7fafc';
+        reel.style.border = '2px solid #e2e8f0';
+        reel.style.borderRadius = '12px';
+        reel.style.fontSize = '2.5rem';
+        reel.style.display = 'flex';
+        reel.style.alignItems = 'center';
+        reel.style.justifyContent = 'center';
+        reel.textContent = '❓';
+        reelsContainer.appendChild(reel);
+        reelDivs.push(reel);
+    }
+    slotContainer.appendChild(reelsContainer);
+
+    let resultText = document.createElement('div');
+    resultText.style.fontSize = '1.25rem';
+    resultText.style.margin = '24px 0 0 0';
+    resultText.textContent = 'Spinning...';
+    slotContainer.appendChild(resultText);
+
+    modal.appendChild(slotContainer);
+    document.body.appendChild(modal);
+
+    // Animate reels
+    let finalReels = [];
+    for (let i = 0; i < 3; i++) {
+        finalReels[i] = reels[Math.floor(Math.random() * reels.length)];
+    }
+    let spinTimes = [900, 1200, 1500];
+    for (let i = 0; i < 3; i++) {
+        let spins = 0;
+        let spinInterval = setInterval(() => {
+            reelDivs[i].textContent = reels[Math.floor(Math.random() * reels.length)];
+            spins++;
+        }, 60);
+        setTimeout(() => {
+            clearInterval(spinInterval);
+            reelDivs[i].textContent = finalReels[i];
+        }, spinTimes[i]);
+    }
+
+    setTimeout(() => {
+        let reel1 = finalReels[0];
+        let reel2 = finalReels[1];
+        let reel3 = finalReels[2];
+        let winnings = 0;
+        if (reel1 === reel2 && reel2 === reel3) {
+            if (reel1 === '💰') {
+                winnings = 10000;
+                resultText.textContent = '💰💰💰 JACKPOT! YOU WON $10,000!';
+                createConfetti('mega');
+                screenShake();
+                achievementCounters.slotJackpots++;
+            } else {
+                winnings = 1000;
+                resultText.textContent = `🎉 Winner! You won $1000!`;
+            }
+        } else if (reel1 === reel2 || reel2 === reel3 || reel1 === reel3) {
+            winnings = 100;
+            resultText.textContent = `👍 Nice! You won $100!`;
         } else {
-            winnings = 1000;
-            showHint(`🎉 Winner! You won $1000!`);
+            resultText.textContent = '😢 Better luck next time!';
         }
-    } else if (reel1 === reel2 || reel2 === reel3 || reel1 === reel3) {
-        winnings = 100;
-        showHint(`👍 Nice! You won $100!`);
-    } else {
-        showHint('😢 Better luck next time!');
-    }
-
-    if (winnings > 0) {
-        money += winnings;
-        totalMoneyEarned += winnings; // Track for achievements
-        createFloatingMoney(winnings, window.innerWidth / 2, window.innerHeight / 2);
-    }
-    updateDisplay(); // Add missing updateDisplay call
+        if (winnings > 0) {
+            money += winnings;
+            totalMoneyEarned += winnings;
+            createFloatingMoney(winnings, window.innerWidth / 2, window.innerHeight / 2);
+        }
+        updateDisplay();
+        // Close modal after 2s
+        setTimeout(() => {
+            modal.remove();
+        }, 2000);
+    }, 1700);
 }
 
 function startNumberBingo() {
