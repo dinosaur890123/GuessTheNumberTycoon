@@ -687,24 +687,43 @@ function spinTheWheel() {
     modal.style.justifyContent = 'center';
     modal.style.zIndex = '2000';
 
-    // Wheel visual
+
+    // Wheel visual (centered flex column)
     let wheelContainer = document.createElement('div');
     wheelContainer.style.background = '#fff';
     wheelContainer.style.borderRadius = '16px';
     wheelContainer.style.padding = '32px';
     wheelContainer.style.boxShadow = '0 4px 24px rgba(0,0,0,0.15)';
     wheelContainer.style.textAlign = 'center';
+    wheelContainer.style.display = 'flex';
+    wheelContainer.style.flexDirection = 'column';
+    wheelContainer.style.alignItems = 'center';
+
+    // Arrow (above wheel, centered)
+    let arrow = document.createElement('div');
+    arrow.style.width = '0';
+    arrow.style.height = '0';
+    arrow.style.borderLeft = '22px solid transparent';
+    arrow.style.borderRight = '22px solid transparent';
+    arrow.style.borderBottom = '38px solid #4299e1';
+    arrow.style.margin = '0 auto -10px auto';
+    arrow.style.position = 'relative';
+    arrow.style.zIndex = '2';
+    wheelContainer.appendChild(arrow);
 
     let wheel = document.createElement('div');
     wheel.id = 'wheel-visual';
-    wheel.style.width = '220px';
-    wheel.style.height = '220px';
+    wheel.style.width = '240px';
+    wheel.style.height = '240px';
     wheel.style.borderRadius = '50%';
-    wheel.style.border = '8px solid #4299e1';
+    wheel.style.border = '10px solid #4299e1';
     wheel.style.margin = '0 auto 24px auto';
     wheel.style.position = 'relative';
     wheel.style.overflow = 'hidden';
     wheel.style.boxShadow = '0 2px 12px rgba(66,153,225,0.15)';
+    wheel.style.display = 'flex';
+    wheel.style.alignItems = 'center';
+    wheel.style.justifyContent = 'center';
 
     // Wheel segments
     const prizes = [
@@ -717,8 +736,8 @@ function spinTheWheel() {
         { value: 1500, text: 'JACKPOT! $1500', color: '#ffd700' }
     ];
     let wheelSVG = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    wheelSVG.setAttribute('width', '220');
-    wheelSVG.setAttribute('height', '220');
+    wheelSVG.setAttribute('width', '240');
+    wheelSVG.setAttribute('height', '240');
     let numSegments = prizes.length;
     let angle = 360 / numSegments;
     for (let i = 0; i < numSegments; i++) {
@@ -726,19 +745,19 @@ function spinTheWheel() {
         let startAngle = angle * i;
         let endAngle = angle * (i + 1);
         let largeArc = endAngle - startAngle > 180 ? 1 : 0;
-        let x1 = 110 + 100 * Math.cos(Math.PI * startAngle / 180);
-        let y1 = 110 + 100 * Math.sin(Math.PI * startAngle / 180);
-        let x2 = 110 + 100 * Math.cos(Math.PI * endAngle / 180);
-        let y2 = 110 + 100 * Math.sin(Math.PI * endAngle / 180);
-        let d = `M110,110 L${x1},${y1} A100,100 0 ${largeArc},1 ${x2},${y2} Z`;
+        let x1 = 120 + 100 * Math.cos(Math.PI * startAngle / 180);
+        let y1 = 120 + 100 * Math.sin(Math.PI * startAngle / 180);
+        let x2 = 120 + 100 * Math.cos(Math.PI * endAngle / 180);
+        let y2 = 120 + 100 * Math.sin(Math.PI * endAngle / 180);
+        let d = `M120,120 L${x1},${y1} A100,100 0 ${largeArc},1 ${x2},${y2} Z`;
         path.setAttribute('d', d);
         path.setAttribute('fill', prizes[i].color);
         wheelSVG.appendChild(path);
         // Add text label
         let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         let labelAngle = startAngle + angle / 2;
-        let tx = 110 + 70 * Math.cos(Math.PI * labelAngle / 180);
-        let ty = 110 + 70 * Math.sin(Math.PI * labelAngle / 180);
+        let tx = 120 + 70 * Math.cos(Math.PI * labelAngle / 180);
+        let ty = 120 + 70 * Math.sin(Math.PI * labelAngle / 180);
         text.setAttribute('x', tx);
         text.setAttribute('y', ty);
         text.setAttribute('text-anchor', 'middle');
@@ -749,20 +768,8 @@ function spinTheWheel() {
         wheelSVG.appendChild(text);
     }
     wheel.appendChild(wheelSVG);
-
-    // Arrow
-    let arrow = document.createElement('div');
-    arrow.style.position = 'absolute';
-    arrow.style.top = '-24px';
-    arrow.style.left = 'calc(50% - 12px)';
-    arrow.style.width = '0';
-    arrow.style.height = '0';
-    arrow.style.borderLeft = '12px solid transparent';
-    arrow.style.borderRight = '12px solid transparent';
-    arrow.style.borderBottom = '24px solid #4299e1';
-    wheel.appendChild(arrow);
-
     wheelContainer.appendChild(wheel);
+
     let resultText = document.createElement('div');
     resultText.style.fontSize = '1.25rem';
     resultText.style.margin = '24px 0 0 0';
@@ -777,6 +784,7 @@ function spinTheWheel() {
     let spins = 5; // Number of full spins
     let totalAngle = 360 * spins + (360 - spinIndex * angle - angle / 2);
     wheelSVG.style.transition = 'transform 2.2s cubic-bezier(.17,.67,.83,.67)';
+    wheelSVG.style.transformOrigin = '50% 50%';
     setTimeout(() => {
         wheelSVG.style.transform = `rotate(${totalAngle}deg)`;
     }, 100);
