@@ -41,13 +41,17 @@
 }
 /* Large Money Display at Top */
 #main-money-display {
-    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
     text-align: center;
-    margin: 0 auto 24px auto;
+    margin: 0 auto 0 auto;
     padding: 24px 0 8px 0;
     background: linear-gradient(90deg, #f7fafc 60%, #e6fffa 100%);
     border-radius: 0 0 24px 24px;
     box-shadow: 0 2px 12px rgba(56, 178, 172, 0.08);
+    z-index: 100;
 }
 .money-label {
     display: block;
@@ -91,7 +95,7 @@ body {
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 24px;
+    padding: 64px 24px 24px 24px; /* Add top padding so content isn't covered by fixed money display */
 }
 
 /* Typography */
